@@ -1,6 +1,5 @@
+from stack_v import *
 class Card:
-    colors = ["green", "red", "blue", "white", "black", "colorless"]
-    types = ["creatures","artifacts", "land"] #to complete
     def __init__ (self, cost, legendary, c_type, effect):
         self.cost = cost
         self.legendary = legendary
@@ -12,7 +11,7 @@ def opti_spend_colorless (mana, card):
     pass #to do but later
 
 def is_playable (can_cast_sorcery, mana, card):
-    mana_cp = mana
+    mana_cp = mana.copy()
     tot_mana = 0
     for l in mana:
         tot_mana += mana[l]
@@ -30,3 +29,12 @@ def is_playable (can_cast_sorcery, mana, card):
         opti_spend_colorless (mana_cp, card)
         return (True, mana_cp)
     return (False, mana)
+
+def eff_card_battlefield (card, battlefield):
+    pass #to do after doing battlefield
+def play_a_card (mana, card):
+    for symbol in cost:
+        mana[symbol] = mana[symbol] - card.cost[symbol]
+    opti_spend_colorless (mana_cp, card)
+    eff_card_battlefield (card, battlefield)
+    return
