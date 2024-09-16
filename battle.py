@@ -46,11 +46,6 @@ def is_playable (can_cast_sorcery, mana, card):
         opti_spend_colorless (mana_cp, card)
         return (True, mana_cp)
     return (False, mana)
-def eff_card (eff, left):
-    pass #to do
-def eff_etb (card, left):
-    pass #to do after doing battlefield
-
 
 class Battlefield:
     def __init__ (self, deck_j_left, deck_j_right):
