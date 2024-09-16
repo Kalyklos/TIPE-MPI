@@ -10,6 +10,8 @@ class Creature:
         self.actual_life = self.life
         self.actual_strength = self.strength
         self.can_attack = False
+        self.is_tap = False
+        self.can_untap = True
 
     def clean_phase (self):
         self.actual_life = self.life
@@ -50,7 +52,10 @@ def is_playable (can_cast_sorcery, mana, card):
 class Battlefield:
     def __init__ (self, deck_j_left, deck_j_right):
         self.life_j_left, self.life_j_right = 20
+        self.can_cast_sorcery_left, self.can_cast_sorcery_right = False
         self.manabase_j_left = {}
+        self.remaining_mana_left = {}
+        self.remaining_mana_rights = {}
         self.manabase_j_right = {}
         self.board_j_left = []
         self.board_j_right = []
@@ -61,6 +66,7 @@ class Battlefield:
         self.hand_j_left, self.hand_j_right = []
         self.gravyard_j_left, self.gravyard_j_right = []
         self.upkeep_left, self.upkeep_right = []
+        self.combat_left, self.combat_right = []
     def is_finish (self):
         if self.life_j_left < 1:
             return 0
@@ -69,8 +75,23 @@ class Battlefield:
         return -1
     def win_the_game (self, left):
         return left
-    def untap (self, left):
-        pass #to do
+    def untap_step (self, left):
+        if left:
+            self.remaining_mana_left = manabase_j_left.copy()
+            for crea in self.creature_j_left:
+                if crea.can_untap:
+                    crea.is_tap = False
+            return
+        self.remaining_mana_right = manabase_j_right.copy()
+        for crea in self.creature_j_right:
+            if crea.can_untap:
+                crea.is_tap = False
+        return
+    def main_phase (self, left, eff):
+        if left:
+            self.can_cast_sorcery_left = True
+        else:
+            self.can_cast_sorcery_right = True
     def new_creature (self, left, crea):
         if left:
             self.creature_j_left.append(crea)
