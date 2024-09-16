@@ -47,7 +47,8 @@ def is_playable (can_cast_sorcery, mana, card):
         opti_spend_colorless (mana_cp, card)
         return (True, mana_cp)
     return (False, mana)
-
+def eff_card (eff, left):
+    pass #to do
 def eff_etb (card, left):
     pass #to do after doing battlefield
 
@@ -65,6 +66,7 @@ class Battlefield:
         self.deck_j_right = deck_j_right
         self.hand_j_left, self.hand_j_right = []
         self.gravyard_j_left, self.gravyard_j_right = []
+        self.upkeep_left, self.upkeep_right = []
     def is_finish (self):
         if self.life_j_left < 1:
             return 0
@@ -73,6 +75,10 @@ class Battlefield:
         return -1
     def win_the_game (self, left):
         return left
+    def untap (self, left):
+        pass #to do
+    def recalcul (self):
+        pass #to do
     def new_creature (self, left, crea):
         if left:
             self.creature_j_left.append(crea)
@@ -106,4 +112,14 @@ class Battlefield:
         random.shuffle(self.deck_j_right)
         draw (True, 7)
         draw (False, 7)
-        if 
+        return randint(1, 2) == 1
+    def new_turn (self, first, left):
+        if left:
+            for i in self.upkeep_left:
+                eff_card(i, left)
+        else:
+            for i in self.upkeep_right:
+                eff_card(i, left)
+        draw(left, 1)
+        untap (left)
+        return
