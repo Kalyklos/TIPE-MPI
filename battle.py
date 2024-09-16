@@ -77,8 +77,6 @@ class Battlefield:
         return left
     def untap (self, left):
         pass #to do
-    def recalcul (self):
-        pass #to do
     def new_creature (self, left, crea):
         if left:
             self.creature_j_left.append(crea)
@@ -123,3 +121,9 @@ class Battlefield:
         draw(left, 1)
         untap (left)
         return
+class Effect:
+    def __init__ (self, nb_of_1_1_counter):
+        pass
+Gigantosaurus_creature = Creature(10, 10, [], [])
+Gigantosaurus = Card(["green","green","green","green","green"], False, "creature",[])
+Test1_creature = Creature(1, 1, [], [])
