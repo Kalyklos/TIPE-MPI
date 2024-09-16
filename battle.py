@@ -1,4 +1,3 @@
-from cartes import *
 from stack_v import *
 import random
 random.seed()
@@ -121,9 +120,20 @@ class Battlefield:
         draw(left, 1)
         untap (left)
         return
-class Effect:
-    def __init__ (self, nb_of_1_1_counter):
-        pass
-Gigantosaurus_creature = Creature(10, 10, [], [])
-Gigantosaurus = Card(["green","green","green","green","green"], False, "creature",[])
-Test1_creature = Creature(1, 1, [], [])
+def add_counter_crea(crea, nb_l, nb_s):
+    crea.life += nb_l
+    crea.strength += nb_s
+    crea.actual_life += nb_l
+    crea.actual_strength += nb_s
+    return
+
+def Effect (left, effect_add):
+    if perma_boost in effect_add.key:
+        add_counter_crea(effect_add[perma_boost[0]], effect_add[perma_boost[1]], effect_add[perma_boost[2]])
+    return
+    
+
+
+Gigantosaurus_creature = Creature(10, 10, [], {})
+Gigantosaurus = Card(["green","green","green","green","green"], False, "creature",{})
+Test1_creature = Creature(1, 1, [], {"perma_boost" : (None, 1,1)})
