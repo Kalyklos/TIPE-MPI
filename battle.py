@@ -19,13 +19,15 @@ class Creature:
         return
 
 class Card:
-    def __init__ (self, cost, legendary, c_type, effect):
+    def __init__ (self, cost, legendary, c_type, card_from_class):
         self.cost = cost
         self.legendary = legendary
         self.c_type = c_type
-        self.effect = effect
+        self.card_from_class = card_from_class
         self.inst = True
-
+class Land:
+    def __init__ (self, color):
+        self.color = color
 def opti_spend_colorless (mana, card):
     pass #to do but later
 
@@ -65,8 +67,26 @@ class Battlefield:
         self.deck_j_right = deck_j_right
         self.hand_j_left, self.hand_j_right = []
         self.gravyard_j_left, self.gravyard_j_right = []
+        self.nb_land_play_left, self.nb_land_play_right = 1
         self.upkeep_left, self.upkeep_right = []
         self.combat_left, self.combat_right = []
+    def play_land (self, left, n):
+        land_in_hand = []
+        if left:
+            for c in self.hand_j_left:
+                if c.c_type == "land":
+                    land_in_hand.append(c)
+            for i in range (n):
+                self.manabase_j_left[land_in_hand.pop().card_from_class.color] += 1
+            return
+        for c in self.hand_j_right:
+            if c.c_type == "land":
+                land_in_hand.append(c)
+        for i in range (n):
+            if len(land_in_hand) > 0:
+                self.manabase_j_right[land_in_hand.pop().card_from_class.color] += 1
+        return
+        
     def is_finish (self):
         if self.life_j_left < 1:
             return 0
