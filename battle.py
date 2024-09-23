@@ -44,12 +44,10 @@ def is_playable (can_cast_sorcery, mana, card):
                 tot_mana -= card.cost[symbol]
                 mana_cp[symbol] = mana_cp[symbol] - card.cost[symbol]
         tot_mana -= card.cost["colorless"]
-
-        if tot_mana >= 0:
+        if tot_mana < 0:
             return False
-        opti_spend_colorless (mana_cp, card)
-        return (True, mana_cp)
-    return (False, mana)
+        return True
+    return False
 
 class Battlefield:
     def __init__ (self, deck_j_left, deck_j_right):

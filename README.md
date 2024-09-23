@@ -1,4 +1,5 @@
 # TIPE-MPI
+Thèmes : "transition, transformation, conversion"
 
 1) => coder magic
 2) => coder des algos + deck
@@ -10,7 +11,14 @@
 11/09/2024 => code
 16/09/2024 => code
 18/09/2024 => code
+23/09/2024 => code algo "naïf" 
 # biblio :
 09/09/2024 => https://docs.python.org/3/tutorial/datastructures.html utilisé pour coder magic (info sur les dict py).
 10/09/2024 => https://mtg.fandom.com/wiki/Keyword_ability utilisé pour information sur magic.
 11/09/2024 => https://docs.python.org/3/library/random.html info sur random
+23/09/2024 => pdf jeu_bayesien_1 info sur jeux bayesien (information incomplète)
+
+
+
+
+se renseigner sur les jeux bayesien
