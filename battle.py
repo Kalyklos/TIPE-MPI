@@ -68,6 +68,12 @@ class Battlefield:
         self.nb_land_play_left, self.nb_land_play_right = 1
         self.upkeep_left, self.upkeep_right = []
         self.combat_left, self.combat_right = []
+        self.phase = ["attack", "main", "block", "damage", "end step", "upkeep"]
+        self.trigger_effect_attack_left, self.trigger_effect_attack_right = []
+        self.trigger_effect_damage_left, self.trigger_effect_damage_right = []
+        self.trigger_effect_upkeep_left, self.trigger_effect_upkeep_right = []
+        self.trigger_effect_end_step_left, self.trigger_effect_end_step_right = []
+        
     def play_land (self, left, n):
         land_in_hand = []
         if left:

@@ -19,4 +19,14 @@ class random_algo:
             if self.left:
                 battlefield_play.play_a_card(battlefield_play.remaining_mana_left, pop(playable_card), True)
             else:
-                battlefield_play.play_a_card(battlefield_play.remaining_mana_right, pop(playable_card), True)
+                battlefield_play.play_a_card(battlefield_play.remaining_mana_right, pop(playable_card), False)
+            playable_card = []
+            if self.left:
+                for c in battlefield_play.hand_j_left:
+                    if is_playable(battlefield_play.can_cast_sorcery_left, battlefield_play.remaining_mana_left, c):
+                        playable_card.append(c)
+            else:
+                for c in battlefield_play.hand_j_right:
+                    if is_playable(battlefield_play.can_cast_sorcery_right, battlefield_play.remaining_mana_right, c):
+                        playable_card.append(c)
+        
