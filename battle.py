@@ -49,6 +49,9 @@ def is_playable (can_cast_sorcery, mana, card):
         return True
     return False
 
+class Effect:
+    pass
+
 class Battlefield:
     def __init__ (self, deck_j_left, deck_j_right):
         self.life_j_left, self.life_j_right = 20
@@ -66,14 +69,70 @@ class Battlefield:
         self.hand_j_left, self.hand_j_right = []
         self.gravyard_j_left, self.gravyard_j_right = []
         self.nb_land_play_left, self.nb_land_play_right = 1
+        self.hand_size_left, self.hand_size_right = 7
         self.upkeep_left, self.upkeep_right = []
         self.combat_left, self.combat_right = []
-        self.phase = ["attack", "main", "block", "damage", "end step", "upkeep"]
+        self.step = ["attack", "main", "block", "damage", "end step", "upkeep"]
         self.trigger_effect_attack_left, self.trigger_effect_attack_right = []
         self.trigger_effect_damage_left, self.trigger_effect_damage_right = []
         self.trigger_effect_upkeep_left, self.trigger_effect_upkeep_right = []
         self.trigger_effect_end_step_left, self.trigger_effect_end_step_right = []
         
+    def draw (self, left, n):
+        if left:
+            if len(deck_j_left < n):
+                win_the_game(False)
+            for i in range (n):
+                hand_j_left.append(deck_j_left.pop())
+            return
+        if len(deck_j_right < n):
+                win_the_game(True)
+        for i in range (n):
+            hand_j_right.append(deck_j_right.pop())
+        return
+
+    def upkeep (self, left):
+        untap_step (self, left)
+        if left:
+            for eff in self.trigger_effect_upkeep_left:
+                eff.trigger()
+        else:
+            for eff in self.trigger_effect_upkeep_right:
+                eff.trigger()
+        draw (self, left, 1)
+
+    def clean_step (self):
+        for crea in creature_j_left:
+            crea.actual_life = crea.life
+            crea.actual_strength = crea.strength
+        for crea in creature_j_right:
+            crea.actual_life = crea.life
+            crea.actual_strength = crea.strength
+        return
+
+    def discard (self, left, n):
+        if left:
+            shuffle (self.hand_j_left)
+            for i in range (n):
+                hand_j_left.pop()
+            return
+        shuffle (self.hand_j_right)
+        for i in range (n):
+            hand_j_right.pop()
+
+    def end_step (self, left):
+        if left:
+            for eff in trigger_effect_end_step_left:
+                eff.trigger ()
+            if (self.hand_size_left - len(self.hand_j_left)) < 0:
+                discard (self, left, (len(self.hand_j_left) - self.hand_size_left))
+            return clean_step ()
+        for eff in trigger_effect_end_step_right:
+            eff.trigger ()
+        if (self.hand_size_right - len(self.hand_j_right)) < 0:
+            discard (self, left, (len(self.hand_j_right) - self.hand_size_right))
+        return clean_step ()      
+
     def play_land (self, left, n):
         land_in_hand = []
         if left:
@@ -90,7 +149,7 @@ class Battlefield:
             if len(land_in_hand) > 0:
                 self.manabase_j_right[land_in_hand.pop().card_from_class.color] += 1
         return
-        
+    def attacking_creature 
     def is_finish (self):
         if self.life_j_left < 1:
             return 0
@@ -132,18 +191,7 @@ class Battlefield:
             hand_j_right.remove(card)
         eff_etb (card, left)
         return
-    def draw (self, left, n):
-        if left:
-            if len(deck_j_left < n):
-                win_the_game(False)
-            for i in range (n):
-                hand_j_left.append(pop(deck_j_left))
-            return
-        if len(deck_j_right < n):
-                win_the_game(True)
-        for i in range (n):
-            hand_j_right.append(pop(deck_j_right))
-        return
+    
     def game_begin (self):
         random.shuffle(self.deck_j_left)
         random.shuffle(self.deck_j_right)
@@ -167,7 +215,7 @@ def add_counter_crea(crea, nb_l, nb_s):
     crea.actual_strength += nb_s
     return
 
-def Effect (left, effect_add):
+def effect (left, effect_add):
     if perma_boost in effect_add.key:
         add_counter_crea(effect_add[perma_boost[0]], effect_add[perma_boost[1]], effect_add[perma_boost[2]])
     return

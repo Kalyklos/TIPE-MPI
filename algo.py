@@ -17,9 +17,9 @@ class random_algo:
         while len(playable_card) > 0:
             random.shuffle(playable_card)
             if self.left:
-                battlefield_play.play_a_card(battlefield_play.remaining_mana_left, pop(playable_card), True)
+                battlefield_play.play_a_card(battlefield_play.remaining_mana_left, playable_card.pop(), True)
             else:
-                battlefield_play.play_a_card(battlefield_play.remaining_mana_right, pop(playable_card), False)
+                battlefield_play.play_a_card(battlefield_play.remaining_mana_right, playable_card.pop(), False)
             playable_card = []
             if self.left:
                 for c in battlefield_play.hand_j_left:
