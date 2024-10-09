@@ -12,6 +12,7 @@ class Creature:
         self.can_attack = False
         self.is_tap = False
         self.can_untap = True
+        self.owner = True
 
     def clean_phase (self):
         self.actual_life = self.life
@@ -50,7 +51,17 @@ def is_playable (can_cast_sorcery, mana, card):
     return False
 
 class Effect:
-    pass
+    def add_counter_crea(crea, nb_l, nb_s):
+        crea.life += nb_l
+        crea.strength += nb_s
+        crea.actual_life += nb_l
+        crea.actual_strength += nb_s
+        return
+
+def effect (left, effect_add):
+    if perma_boost in effect_add.key:
+        add_counter_crea(effect_add[perma_boost[0]], effect_add[perma_boost[1]], effect_add[perma_boost[2]])
+    return
 
 class Battlefield:
     def __init__ (self, deck_j_left, deck_j_right):
@@ -149,7 +160,17 @@ class Battlefield:
             if len(land_in_hand) > 0:
                 self.manabase_j_right[land_in_hand.pop().card_from_class.color] += 1
         return
-    def attacking_creature 
+    def possible_attacking_creature(self, left):
+        tab = []
+        if left:
+            for crea in board_j_left:
+                if crea.can_attack and not (crea.is_tap):
+                    tab.append(crea)
+        else:
+            for crea in board_j_right:
+                if crea.can_attack and not (crea.is_tap):
+                    tab.append(crea)
+        return tab
     def is_finish (self):
         if self.life_j_left < 1:
             return 0
@@ -208,18 +229,36 @@ class Battlefield:
         draw(left, 1)
         untap (left)
         return
-def add_counter_crea(crea, nb_l, nb_s):
-    crea.life += nb_l
-    crea.strength += nb_s
-    crea.actual_life += nb_l
-    crea.actual_strength += nb_s
-    return
+    def dying_creature (self, tab):
+        for i in range (len(self.creature_j_left) -1):
+            if self.creature_j_left[i].actual_life < 1:
+                tab.append(self.creature_j_left.pop([i]))
+        for i in range (len(self.creature_j_right) -1):
+            if self.creature_j_right[i].actual_life < 1:
+                tab.append(self.creature_j_right.pop([i]))
+        return
 
-def effect (left, effect_add):
-    if perma_boost in effect_add.key:
-        add_counter_crea(effect_add[perma_boost[0]], effect_add[perma_boost[1]], effect_add[perma_boost[2]])
-    return
-    
+class Combat_phase:
+    def __init__ (self, actual_battlefield):
+        self.actual_battlefield = actual_battlefield
+        self.attacking_creature = {}
+        self.died_creature = []
+    def reset (self):
+        self.attacking_creature = {}
+        self.died_creature = []
+    def attack_phase (self, attacking_creature_tab):
+        for crea in attacking_creature_tab:
+            self.attacking_creature[crea] = []
+    def assign_damage (self):
+        for crea in self.attacking_creature.keys:
+            if attacking_creature[crea] == []:
+                if crea.owner:
+                    self.actual_battlefield.life_j_right -= crea.actual_strength
+                else:
+                    self.actual_battlefield.life_j_right -= crea.actual_strength
+            else:
+                crea.actual_life -= self.attacking_creature[crea].actual_strength
+                self.attacking_creature[crea].actual_life -= crea.actual_strength
 
 
 Gigantosaurus_creature = Creature(10, 10, [], {})
