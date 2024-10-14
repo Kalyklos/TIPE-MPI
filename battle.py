@@ -65,6 +65,7 @@ def effect (left, effect_add):
 
 class Battlefield:
     def __init__ (self, deck_j_left, deck_j_right):
+        self.end = False
         self.life_j_left, self.life_j_right = 20
         self.can_cast_sorcery_left, self.can_cast_sorcery_right = False
         self.manabase_j_left = {}
@@ -259,6 +260,14 @@ class Combat_phase:
             else:
                 crea.actual_life -= self.attacking_creature[crea].actual_strength
                 self.attacking_creature[crea].actual_life -= crea.actual_strength
+        dying_creature (self.died_creature)
+    def died_effect (self):
+        for crea in died_creature:
+            c = died_creature.pop()
+            c.died_effect()
+    def finish (self):
+        if actual_battlefield.is_finish == -1:
+            actual_battlefield.end = True
 
 
 Gigantosaurus_creature = Creature(10, 10, [], {})
