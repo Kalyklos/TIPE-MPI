@@ -14,6 +14,7 @@ Thèmes : "transition, transformation, conversion"
 23/09/2024 => code algo "naïf" 
 30/09/2024 => continue code
 07/10/2024 => implémentation des phases
+14/10/2024 => fin v1 des phases + algo "naïf"
 # biblio :
 09/09/2024 => https://docs.python.org/3/tutorial/datastructures.html utilisé pour coder magic (info sur les dict py).
 10/09/2024 => https://mtg.fandom.com/wiki/Keyword_ability utilisé pour information sur magic.
