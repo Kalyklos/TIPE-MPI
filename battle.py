@@ -66,6 +66,7 @@ def effect (left, effect_add):
 class Battlefield:
     def __init__ (self, deck_j_left, deck_j_right):
         self.end = False
+        self.winner = 0
         self.life_j_left, self.life_j_right = 20
         self.can_cast_sorcery_left, self.can_cast_sorcery_right = False
         self.manabase_j_left = {}
