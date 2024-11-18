@@ -51,6 +51,7 @@ def is_playable (can_cast_sorcery, mana, card):
     return False
 
 class Effect:
+    def __init__ (self, upkeep_t, endstep_t, )
     def add_counter_crea(crea, nb_l, nb_s):
         crea.life += nb_l
         crea.strength += nb_s
