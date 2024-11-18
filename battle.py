@@ -2,7 +2,7 @@ from stack_v import *
 import random
 random.seed()
 class Creature:
-    def __init__ (self, strength, life, keywords, effect):
+    def __init__ (self, strength, life, keywords, effect, cost):
         self.strength = strength
         self.life = life
         self.keywords = keywords
@@ -13,24 +13,21 @@ class Creature:
         self.is_tap = False
         self.can_untap = True
         self.owner = True
+        self.cost = cost
 
     def clean_phase (self):
         self.actual_life = self.life
         self.actual_strength = self.strength
         return
 
-class Card:
-    def __init__ (self, cost, legendary, c_type, card_from_class):
-        self.cost = cost
-        self.legendary = legendary
-        self.c_type = c_type
-        self.card_from_class = card_from_class
-        self.inst = True
 class Land:
     def __init__ (self, color):
         self.color = color
-def opti_spend_colorless (mana, card):
-    pass #to do but later
+
+class Card:
+    def __init__ (self, c_type, name):
+        self.c_type = c_type
+        self.name = name
 
 def is_playable (can_cast_sorcery, mana, card):
     mana_cp = mana.copy()
@@ -51,7 +48,8 @@ def is_playable (can_cast_sorcery, mana, card):
     return False
 
 class Effect:
-    def __init__ (self, upkeep_t, endstep_t, )
+    def __init__ (self, upkeep_t, endstep_t, dying):
+        pass
     def add_counter_crea(crea, nb_l, nb_s):
         crea.life += nb_l
         crea.strength += nb_s
@@ -67,7 +65,7 @@ def effect (left, effect_add):
 class Battlefield:
     def __init__ (self, deck_j_left, deck_j_right):
         self.end = False
-        self.winner = 0
+        self.winner = -1
         self.life_j_left, self.life_j_right = 20
         self.can_cast_sorcery_left, self.can_cast_sorcery_right = False
         self.manabase_j_left = {}
@@ -208,7 +206,6 @@ class Battlefield:
     def play_a_card (mana, card, left):
         for symbol in cost:
             mana[symbol] = mana[symbol] - card.cost[symbol]
-        opti_spend_colorless (mana_cp, card)
         if left:
             hand_j_left.remove(card)
         else:
@@ -271,7 +268,3 @@ class Combat_phase:
         if actual_battlefield.is_finish == -1:
             actual_battlefield.end = True
 
-
-Gigantosaurus_creature = Creature(10, 10, [], {})
-Gigantosaurus = Card(["green","green","green","green","green"], False, "creature",{})
-Test1_creature = Creature(1, 1, [], {"perma_boost" : (None, 1,1)})

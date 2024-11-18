@@ -17,6 +17,7 @@ Thèmes : "transition, transformation, conversion"
 14/10/2024 => fin v1 des phases + algo "naïf"
 16/10/2024 => début multi duel
 04/11/2024 => multi duel, v1 finie
+18/11/2024 => relation entre deck, cartes, cartes joué
 # biblio :
 09/09/2024 => https://docs.python.org/3/tutorial/datastructures.html utilisé pour coder magic (info sur les dict py).
 10/09/2024 => https://mtg.fandom.com/wiki/Keyword_ability utilisé pour information sur magic.
