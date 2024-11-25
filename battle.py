@@ -9,11 +9,12 @@ class Creature:
         self.effect = effect
         self.actual_life = self.life
         self.actual_strength = self.strength
-        self.can_attack = False
         self.is_tap = False
         self.can_untap = True
         self.owner = True
         self.cost = cost
+        self.summoning_sickness = True
+        self.mana_producers = []
 
     def clean_phase (self):
         self.actual_life = self.life
@@ -30,21 +31,12 @@ class Card:
         self.name = name
 
 def is_playable (can_cast_sorcery, mana, card):
-    mana_cp = mana.copy()
-    tot_mana = 0
-    for l in mana:
-        tot_mana += mana[l]
     if (card.inst or can_cast_sorcery):
         for symbol in cost:
-            if (mana[symbol] <= card.cost[symbol]) and (symbol != "colorless"):
+            if mana[symbol] <= card.cost[symbol]:
                 return (False, mana)
             else:
-                tot_mana -= card.cost[symbol]
-                mana_cp[symbol] = mana_cp[symbol] - card.cost[symbol]
-        tot_mana -= card.cost["colorless"]
-        if tot_mana < 0:
-            return False
-        return True
+                return (True, mana-card.cost[symbol])
     return False
 
 class Effect:
@@ -68,10 +60,9 @@ class Battlefield:
         self.winner = -1
         self.life_j_left, self.life_j_right = 20
         self.can_cast_sorcery_left, self.can_cast_sorcery_right = False
-        self.manabase_j_left = {}
-        self.remaining_mana_left = {}
-        self.remaining_mana_rights = {}
-        self.manabase_j_right = {}
+        self.mana_by_crea_left, self.mana_by_crea_right = 0
+        self.mana_use_left = 0
+        self.mana_use_rights = 0
         self.board_j_left = []
         self.board_j_right = []
         self.creature_j_left = []
@@ -80,7 +71,7 @@ class Battlefield:
         self.deck_j_right = deck_j_right
         self.hand_j_left, self.hand_j_right = []
         self.gravyard_j_left, self.gravyard_j_right = []
-        self.nb_land_play_left, self.nb_land_play_right = 1
+        self.nb_land_in_play_left, self.nb_land_in_play_right = 0
         self.hand_size_left, self.hand_size_right = 7
         self.upkeep_left, self.upkeep_right = []
         self.combat_left, self.combat_right = []
@@ -150,26 +141,23 @@ class Battlefield:
         if left:
             for c in self.hand_j_left:
                 if c.c_type == "land":
-                    land_in_hand.append(c)
-            for i in range (n):
-                self.manabase_j_left[land_in_hand.pop().card_from_class.color] += 1
-            return
+                    self.nb_land_in_play_left +=1
+                    self.hand_j_left.remove(c)
+                    return
         for c in self.hand_j_right:
             if c.c_type == "land":
-                land_in_hand.append(c)
-        for i in range (n):
-            if len(land_in_hand) > 0:
-                self.manabase_j_right[land_in_hand.pop().card_from_class.color] += 1
-        return
+                self.nb_land_in_play_right +=1
+                self.hand_j_right.remove(c)
+                return
     def possible_attacking_creature(self, left):
         tab = []
         if left:
             for crea in board_j_left:
-                if crea.can_attack and not (crea.is_tap):
+                if not(crea.summoning_sickness or crea.is_tap):
                     tab.append(crea)
         else:
             for crea in board_j_right:
-                if crea.can_attack and not (crea.is_tap):
+                if not(crea.summoning_sickness or crea.is_tap):
                     tab.append(crea)
         return tab
     def is_finish (self):
@@ -182,13 +170,21 @@ class Battlefield:
         return left
     def untap_step (self, left):
         if left:
-            self.remaining_mana_left = manabase_j_left.copy()
+            self.mana_use_left = 0
             for crea in self.creature_j_left:
+                if len(crea.mana_producers) > 0:
+                    if crea.summoning_sickness:
+                        self.mana_by_crea_left += 1
+                crea.summoning_sickness = False
                 if crea.can_untap:
                     crea.is_tap = False
             return
-        self.remaining_mana_right = manabase_j_right.copy()
+        self.mana_use_right = 0
         for crea in self.creature_j_right:
+            if len(crea.mana_producers) > 0:
+                if crea.summoning_sickness:
+                    self.mana_by_crea_right += 1
+            crea.summoning_sickness = False
             if crea.can_untap:
                 crea.is_tap = False
         return
@@ -203,11 +199,15 @@ class Battlefield:
             return
         self.creature_j_right.append(crea)
         return
-    def play_a_card (mana, card, left):
-        for symbol in cost:
-            mana[symbol] = mana[symbol] - card.cost[symbol]
+    def play_a_card (self, card, left):
+        mana_needed = 0
+        for symbol in card.cost:
+            mana_needed += card.cost[symbol]
         if left:
+            self.mana_use_left += mana_needed
             hand_j_left.remove(card)
+            if self.mana_use_left > self.nb_land_in_play_left:
+                
         else:
             hand_j_right.remove(card)
         eff_etb (card, left)
