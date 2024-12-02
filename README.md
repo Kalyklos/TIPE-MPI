@@ -18,7 +18,7 @@ Thèmes : "transition, transformation, conversion"
 16/10/2024 => début multi duel
 04/11/2024 => multi duel, v1 finie
 18/11/2024 => relation entre deck, cartes, cartes joué
-25/11/2024 => 
+25/11/2024 => implémentation effet et refonte du mana
 # biblio :
 09/09/2024 => https://docs.python.org/3/tutorial/datastructures.html utilisé pour coder magic (info sur les dict py).
 10/09/2024 => https://mtg.fandom.com/wiki/Keyword_ability utilisé pour information sur magic.
