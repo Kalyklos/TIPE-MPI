@@ -1,8 +1,50 @@
 from stack_v import *
 import random
-random.seed()
+random.seed() #to give something that seem more random to use the random function (cause the random is hardcode)
+class Effect:
+    def __init__ (self, upkeep_t, endstep_t, entering, dying):
+        """init of the effect class
+
+        Args:
+            upkeep_t (tab): _description_
+            endstep_t (tab): _description_
+            entering (tab): _description_
+            dying (tab): _description_
+        """
+        self.upkeep_t = upkeep_t
+        self.endstep_t = endstep_t
+        self.entering = entering
+        self.dying = dying
+    def add_counter_crea(crea, nb):
+        """Put nb +1/+1 counter onto the creature crea
+
+        Args:
+            crea (Creature): The creature to put counter on it
+            nb (int): the number of counter
+        """
+        crea.life += nb
+        crea.strength += nb
+        crea.actual_life += nb
+        crea.actual_strength += nb
+        return
+    def 
+
+def effect (left, effect_add):
+    if perma_boost in effect_add.key:
+        add_counter_crea(effect_add[perma_boost[0]], effect_add[perma_boost[1]], effect_add[perma_boost[2]])
+    return
+
 class Creature:
     def __init__ (self, strength, life, keywords, effect, cost):
+        """Init of the creature class
+
+        Args:
+            strength (int): strength of the creature
+            life (int): toughness of the creature
+            keywords (tab of str): keywords of the creature (like Trample, Flying...)
+            effect (Effect): effect of the creature (upkeep, endstep, entering, dying)
+            cost (dict): dictionnaire of colors and the nombers of mana of that type in their cost (ex : "Green" : 5)
+        """
         self.strength = strength
         self.life = life
         self.keywords = keywords
@@ -14,45 +56,27 @@ class Creature:
         self.owner = True
         self.cost = cost
         self.summoning_sickness = True
-        self.mana_producers = []
-
-    def clean_phase (self):
-        self.actual_life = self.life
-        self.actual_strength = self.strength
-        return
+        self.mana_producers = 0
 
 class Land:
     def __init__ (self, color):
+        """init of the Land class
+
+        Args:
+            color (str): The color of mana that produce the land
+        """
         self.color = color
 
 class Card:
     def __init__ (self, c_type, name):
+        """init of the Card class
+
+        Args:
+            c_type (str): The type of the card (like "Creature", "Instant"...)
+            name (str): The name of the card
+        """
         self.c_type = c_type
         self.name = name
-
-def is_playable (can_cast_sorcery, mana, card):
-    if (card.inst or can_cast_sorcery):
-        for symbol in cost:
-            if mana[symbol] <= card.cost[symbol]:
-                return (False, mana)
-            else:
-                return (True, mana-card.cost[symbol])
-    return False
-
-class Effect:
-    def __init__ (self, upkeep_t, endstep_t, dying):
-        pass
-    def add_counter_crea(crea, nb_l, nb_s):
-        crea.life += nb_l
-        crea.strength += nb_s
-        crea.actual_life += nb_l
-        crea.actual_strength += nb_s
-        return
-
-def effect (left, effect_add):
-    if perma_boost in effect_add.key:
-        add_counter_crea(effect_add[perma_boost[0]], effect_add[perma_boost[1]], effect_add[perma_boost[2]])
-    return
 
 class Battlefield:
     def __init__ (self, deck_j_left, deck_j_right):
@@ -61,8 +85,8 @@ class Battlefield:
         self.life_j_left, self.life_j_right = 20
         self.can_cast_sorcery_left, self.can_cast_sorcery_right = False
         self.mana_by_crea_left, self.mana_by_crea_right = 0
-        self.mana_use_left = 0
-        self.mana_use_rights = 0
+        self.mana_used_left = 0
+        self.mana_used_rights = 0
         self.board_j_left = []
         self.board_j_right = []
         self.creature_j_left = []
@@ -80,15 +104,43 @@ class Battlefield:
         self.trigger_effect_damage_left, self.trigger_effect_damage_right = []
         self.trigger_effect_upkeep_left, self.trigger_effect_upkeep_right = []
         self.trigger_effect_end_step_left, self.trigger_effect_end_step_right = []
+    def is_playable (self, left, card):
+    """A function to calcul if the card card is actually playable or not.
+
+    Args:
+        left (bool): To know which player want to play (True = left)
+        card (Card): The card to know if it playable
+
+    Returns:
+        bool : If the card is playable then True
+    """
+        if left:
+            for symbol in card.cost:
+                if (self.mana_by_crea_left + self.nb_land_in_play_left - self.mana_used_left) <= card.cost[symbol]:
+                    return False
+                else:
+                    return True
+        for symbol in card.cost: #here, this isn't the left player who want to play
+            if (self.mana_by_crea_left + self.nb_land_in_play_left - self.mana_used_left) <= card.cost[symbol]:
+                return False
+            else:
+                return True
+        return False
         
     def draw (self, left, n):
+        """A function to draw n card.
+
+        Args:
+            left (bool): if it's the left player who need to draw then True
+            n (int)): the number of card to draw
+        """
         if left:
-            if len(deck_j_left < n):
+            if len(deck_j_left < n): #to check if the player can draw (if not he loses the game)
                 win_the_game(False)
             for i in range (n):
                 hand_j_left.append(deck_j_left.pop())
             return
-        if len(deck_j_right < n):
+        if len(deck_j_right < n): #to check if the player can draw (if not he loses the game)
                 win_the_game(True)
         for i in range (n):
             hand_j_right.append(deck_j_right.pop())
@@ -170,7 +222,7 @@ class Battlefield:
         return left
     def untap_step (self, left):
         if left:
-            self.mana_use_left = 0
+            self.mana_used_left = 0
             for crea in self.creature_j_left:
                 if len(crea.mana_producers) > 0:
                     if crea.summoning_sickness:
@@ -179,7 +231,7 @@ class Battlefield:
                 if crea.can_untap:
                     crea.is_tap = False
             return
-        self.mana_use_right = 0
+        self.mana_used_right = 0
         for crea in self.creature_j_right:
             if len(crea.mana_producers) > 0:
                 if crea.summoning_sickness:
@@ -204,10 +256,11 @@ class Battlefield:
         for symbol in card.cost:
             mana_needed += card.cost[symbol]
         if left:
-            self.mana_use_left += mana_needed
+            self.mana_used_left += mana_needed
             hand_j_left.remove(card)
-            if self.mana_use_left > self.nb_land_in_play_left:
-                
+            if self.mana_used_left > self.nb_land_in_play_left:
+                #to do
+                pass
         else:
             hand_j_right.remove(card)
         eff_etb (card, left)
