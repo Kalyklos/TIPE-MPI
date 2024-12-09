@@ -127,7 +127,7 @@ class Battlefield:
                     return False
                 else:
                     return True
-        for symbol in card.cost: #here, this isn't the left player who want to play
+        for symbol in card.cost: #here, this isn't the left player who want to play (python indentation)
             if (self.mana_by_crea_left + self.nb_land_in_play_left - self.mana_used_left) <= card.cost[symbol]:
                 return False
             else:
@@ -312,7 +312,7 @@ class Battlefield:
         self.creature_j_right.append(crea)
         return
     def play_a_card (self, card, left):
-        """a function to play the card card
+        """a function to play the card card, the card to play is supposed playable
 
         Args:
             card (Card): a magic card from the Card class
@@ -322,13 +322,26 @@ class Battlefield:
         for symbol in card.cost:
             mana_needed += card.cost[symbol]
         if left:
-            self.mana_used_left += mana_needed
+            remaining_by_land = self.nb_land_in_play_left - mana_needed
+            if remaining_by_land < 0:
+                mana_creature = []
+                for crea in self.board_j_left:
+                    if crea.mana_producers > 0 and not crea.summoning_sickness and not crea.is_tap:
+                        mana_creature.append[crea]
+                for i in range (-remaining_by_land):
+                    mana_creature[i].is_tap = True
             hand_j_left.remove(card)
-            if self.mana_used_left > self.nb_land_in_play_left:
-                #to do with mana creatures
-                pass
-        else:
-            hand_j_right.remove(card)
+            eff_etb (card, left)
+            return                
+        remaining_by_land = self.nb_land_in_play_right - mana_needed
+        if remaining_by_land < 0:
+            mana_creature = []
+            for crea in self.board_j_right:
+                if crea.mana_producers > 0 and not crea.summoning_sickness and not crea.is_tap:
+                    mana_creature.append[crea]
+            for i in range (-remaining_by_land):
+                mana_creature[i].is_tap = True
+        hand_j_right.remove(card)
         eff_etb (card, left)
         return
     

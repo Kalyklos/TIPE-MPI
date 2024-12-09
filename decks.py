@@ -13,6 +13,7 @@ data_base ["Sentinel Spider"] = Creature(4,4,["vigilance", "reach"],[],{"green" 
 data_base ["Woodland Mystic"] = Creature(1,1,[],[],{"green" : 2})
 data_base ["Woodland Mystic"].mana_producers = 1
 data_base ["Ilysian Caryatid"] = Creature(1,1,[],[],{"green" : 2})
+data_base ["Ilysian Caryatid"].mana_producers = 1 #to do : update this creature like in the real game
 
 
 mono_green = {}

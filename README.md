@@ -20,6 +20,7 @@ Thèmes : "transition, transformation, conversion"
 18/11/2024 => relation entre deck, cartes, cartes joué
 25/11/2024 => implémentation effet et refonte du mana
 02/12/2024 => doc et implémentation deck mono vert
+09/12/2024 => fin de la docstring, dépense de mana optimal
 # biblio :
 09/09/2024 => https://docs.python.org/3/tutorial/datastructures.html utilisé pour coder magic (info sur les dict py).
 10/09/2024 => https://mtg.fandom.com/wiki/Keyword_ability utilisé pour information sur magic.
