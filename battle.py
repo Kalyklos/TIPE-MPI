@@ -4,7 +4,7 @@ from stack_v import *
 import random
 random.seed() #to give something that seem more random to use the random function (cause the random is hardcode)
 class Effect:
-    def __init__ (self, upkeep_t, endstep_t, entering, dying):
+    def __init__ (self, upkeep_t, endstep_t, entering, dying, attacking):
         """init of the effect class
 
         Args:
@@ -17,6 +17,17 @@ class Effect:
         self.endstep_t = endstep_t
         self.entering = entering
         self.dying = dying
+        self.attacking = attacking
+    def execute_enter (self):
+        pass
+    def execute_end (self):
+        pass
+    def execute_dying (self):
+        pass
+    def execute_up (self):
+        pass
+    def execute_att (self):
+        pass
     def add_counter_crea(crea, nb):
         """Put nb +1/+1 counter onto the creature crea
 
@@ -29,11 +40,16 @@ class Effect:
         crea.actual_life += nb
         crea.actual_strength += nb
         return
-
-def effect (left, effect_add):
-    if perma_boost in effect_add.key:
-        add_counter_crea(effect_add[perma_boost[0]], effect_add[perma_boost[1]], effect_add[perma_boost[2]])
-    return
+    def damage (self, target, ennemy):
+        ennemy.actual_life -= target.actual_strength
+        return
+    def land_boost (self, crea, actual_battlefield):
+        if crea.owner:
+            crea.actual_life += actual_battlefield.nb_land_in_play_left
+            crea.actual_strength += actual_battlefield.nb_land_in_play_left
+        else:
+            crea.actual_life += actual_battlefield.nb_land_in_play_right
+            crea.actual_strength += actual_battlefield.nb_land_in_play_right
 
 class Creature:
     def __init__ (self, strength, life, keywords, effect, cost):
@@ -70,7 +86,7 @@ class Land:
 
 class Card:
     def __init__ (self, c_type, name):
-        """init of the Card class
+        """Init of the Card class
 
         Args:
             c_type (str): The type of the card (like "Creature", "Instant"...)
@@ -78,6 +94,39 @@ class Card:
         """
         self.c_type = c_type
         self.name = name
+class Instant:
+    def __init__(self, untap, nb_counter, trample, cost):
+        """Init of the instant function
+
+        Args:
+            untap (bool): To know if the instant untap the target(s) (True -> Yes)
+            nb_counter_plus (int): The number of counter +1/+1 to put on the target(s)
+            cost (dict): dictionnaire of colors and the nombers of mana of that type in their cost (ex : "Green" : 5)
+        """
+        self.untap = untap
+        self.nb_counter = nb_counter
+        self.target = target
+        self.cost = cost
+        self.trample = trample
+    def execute (self, target, target_to_damage):
+        """A function to do the effect of an instant
+    
+        Args:
+            target (Creature) : The creature that's the main target of the spell
+            target_to_damage (Creature) : The creature to deals damage (if the spell said that else None)
+        """
+        if self.untap:
+            target.is_tap = False
+        target.actual_life += self.nb_counter
+        target.actual_strength += self.nb_counter
+        target.strength += self.nb_counter
+        target.life += self.nb_counter
+        if self.trample:
+            if not ("trample" in target.keywords):
+                target.keywords.append("trample")
+        if target_to_damage != None:
+            target_to_damage.actual_life -= target.actual_strength
+
 
 class Battlefield:
     def __init__ (self, deck_j_left, deck_j_right):
@@ -94,8 +143,6 @@ class Battlefield:
         self.mana_by_crea_left, self.mana_by_crea_right = 0
         self.mana_used_left = 0
         self.mana_used_rights = 0
-        self.board_j_left = []
-        self.board_j_right = []
         self.creature_j_left = []
         self.creature_j_right = []
         self.deck_j_left = deck_j_left
@@ -245,11 +292,11 @@ class Battlefield:
         """
         tab = []
         if left:
-            for crea in board_j_left:
+            for crea in creature_j_left:
                 if not(crea.summoning_sickness or crea.is_tap):
                     tab.append(crea)
         else:
-            for crea in board_j_right:
+            for crea in creature_j_right:
                 if not(crea.summoning_sickness or crea.is_tap):
                     tab.append(crea)
         return tab
@@ -325,7 +372,7 @@ class Battlefield:
             remaining_by_land = self.nb_land_in_play_left - mana_needed
             if remaining_by_land < 0:
                 mana_creature = []
-                for crea in self.board_j_left:
+                for crea in self.creature_j_left:
                     if crea.mana_producers > 0 and not crea.summoning_sickness and not crea.is_tap:
                         mana_creature.append[crea]
                 for i in range (-remaining_by_land):
@@ -336,7 +383,7 @@ class Battlefield:
         remaining_by_land = self.nb_land_in_play_right - mana_needed
         if remaining_by_land < 0:
             mana_creature = []
-            for crea in self.board_j_right:
+            for crea in self.creature_j_right:
                 if crea.mana_producers > 0 and not crea.summoning_sickness and not crea.is_tap:
                     mana_creature.append[crea]
             for i in range (-remaining_by_land):
@@ -368,18 +415,19 @@ class Battlefield:
         draw(left, 1)
         untap (left)
         return
-    def dying_creature (self, tab):
+    def dying_creature (self, tab_left, tab_right):
         """a function to update the python list tab, adding the died creature
 
         Args:
-            tab (tab): a python list initially empty
+            tab_left (tab): a python list initially empty
+            tab_right (tab): a python list initially empty
         """
-        for i in range (len(self.creature_j_left) -1):
+        for i in range (len(self.creature_j_left)):
             if self.creature_j_left[i].actual_life < 1:
-                tab.append(self.creature_j_left.pop([i]))
-        for i in range (len(self.creature_j_right) -1):
+                tab_left.append(self.creature_j_left.pop([i]))
+        for i in range (len(self.creature_j_right)):
             if self.creature_j_right[i].actual_life < 1:
-                tab.append(self.creature_j_right.pop([i]))
+                tab_right.append(self.creature_j_right.pop([i]))
         return
 
 class Combat_phase:
@@ -391,7 +439,7 @@ class Combat_phase:
         """
         self.actual_battlefield = actual_battlefield
         self.attacking_creature = {}
-        self.died_creature = []
+        self.died_creature_left, self.died_creature_right = []
     def reset (self):
         """a function to reset the combat phase
         """
@@ -421,12 +469,17 @@ class Combat_phase:
     def died_effect (self):
         """a function to execute the died effect
         """
-        for crea in died_creature:
-            c = died_creature.pop()
+        for crea in died_creature_left:
+            c = self.died_creature.pop()
+            self.actual_battlefield.creature_j_left.remove(c)
             c.died_effect()
+        for crea in died_creature_right:
+            c = self.died_creature.pop()
+            self.actual_battlefield.creature_j_right.remove(c)
+            c.died_effect()
+        
     def finish (self):
         """a function to actualise if wheather or not the duel is finished
         """
         if actual_battlefield.is_finish == -1:
             actual_battlefield.end = True
-
