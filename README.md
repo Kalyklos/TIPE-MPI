@@ -5,7 +5,9 @@ Thèmes : "transition, transformation, conversion"
 2) => coder des algos + deck
 3) => coder algos représentant des stratégies sur les meilleurs algos précédent et ...
 
-acheter M. Yildizoglu. “Introduction a` la theorie ´ des jeux”. Dunod. 2003
+M. Yildizoglu. “Introduction a` la theorie ´ des jeux”. Dunod. 2003
+https://www.yildizoglu.fr/livretj/
+https://books.google.fr/books?hl=fr&lr=&id=KaZG1yyzJn0C&oi=fnd&pg=PR5&dq=M.+Yildizoglu&ots=oIRw_gguTG&sig=kXPvCXDJ4uItKUpetU7FvFBizkY#v=onepage&q&f=false
 
 # calandar : 
 09/09/2024 => init du code de magic
