@@ -22,6 +22,10 @@ data_base ["Epic Proportions"] = Instant(false, 5, True, {"green" : 6})
 data_base ["Wildwood Patrol"] = Creature(4,2,["trample"], [], {"green" : 3})
 data_base ["Affectionate Indrik"] = Creature(4,4,[], [Effect([],[],[True],[],[])], {"green" : 6})
 data_base ["Rampaging Brontodon"] = Creature(7,7, ["trample"], [Effect([],[],[],[],[True])], {"green" : 7})
+data_base ["Colossal Majesty"] = Enchantment([Effect([True],[],[],[],[])], {"green" : 3})
+data_base ["Baloth Packhunter"] = Creature(3,3,["trample"],[Effect([],[],[False, True],[],[])], {"green" : 4})
+data_base ["Baloth Packhunter"].baloth = True
+data_base ["Jungle Delver"] = Creature(1,1,[],[Effect([],[True],[],[],[])],{"green" : 1})
 
 """ Création du deck mono-vert.
 """
@@ -38,8 +42,5 @@ mono_green ["Epic Proportions"] = 1
 mono_green ["Wildwood Patrol"] = 2
 mono_green ["Affectionate Indrik"] = 2
 mono_green ["Rampaging Brontodon"] = 1
-
-# deck list mono-green :
-# Jungle delver *3 (1/1, pay 4 to get a +1/+1 counter, 1 mana)
-# Colossal Majesty *2 (enchant, upkeep draw if crea power >= 4, 3 mana)
-# Baloth Packhunter *4 (3/3 trample, enter 2 +1/+1 counter onto other crea with the same name, 4 mana)
+mono_green ["Colossal Majesty"] = 2
+mono_green ["Baloth Packhunter"] = 4

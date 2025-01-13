@@ -2,7 +2,7 @@
 
 from stack_v import *
 import random
-random.seed() #to give something that seem more random to use the random function (cause the random is hardcode)
+random.seed() #to give something that seem more random to use than only the random function (cause the random is hardcode)
 class Effect:
     def __init__ (self, upkeep_t, endstep_t, entering, dying, attacking):
         """init of the effect class
@@ -18,6 +18,7 @@ class Effect:
         self.entering = entering
         self.dying = dying
         self.attacking = attacking
+        self.target = None
     def execute_enter (self):
         pass
     def execute_end (self):
@@ -26,8 +27,11 @@ class Effect:
         pass
     def execute_up (self):
         pass
-    def execute_att (self):
-        pass
+    def execute_att (self, crea, actual_battlefield):
+        for b in self.attacking:
+            if b:
+                land_boost (self, crea, actual_battlefield)
+        return
     def add_counter_crea(crea, nb):
         """Put nb +1/+1 counter onto the creature crea
 
@@ -40,8 +44,59 @@ class Effect:
         crea.actual_life += nb
         crea.actual_strength += nb
         return
+    def delver_pay (self, left, actual_battlefield):
+        if left:
+            mana_remaining = actual_battlefield.nb_land_in_play_left - actual_battlefield.mana_used_left #au pire 25 donc 6 tour de boucle while
+            if mana_remaining > 3:
+                l_delver = [] #au maximum de taille 3
+                for crea in actual_battlefield.creature_j_left:
+                    if crea.delver:
+                        l_delver.append (crea)
+                cpt = 0
+                while mana_remaining > 3:
+                    add_counter_crea (l_delver[cpt])
+                    cpt = (cpt + 1) % len (l_delver)
+                    mana_remaining -= 4
+            return
+        mana_remaining = actual_battlefield.nb_land_in_play_right - actual_battlefield.mana_used_right #au pire 25 donc 6 tour de boucle while
+        if mana_remaining > 3:
+            l_delver = [] #au maximum de taille 3
+            for crea in actual_battlefield.creature_j_right:
+                if crea.delver:
+                    l_delver.append (crea)
+            cpt = 0
+            while mana_remaining > 3:
+                add_counter_crea (l_delver[cpt])
+                cpt = (cpt + 1) % len (l_delver)
+                mana_remaining -= 4
+        return
     def damage (self, target, ennemy):
         ennemy.actual_life -= target.actual_strength
+        return
+    def add_baloth (self, crea_entering, left, actual_battlefield):
+        crea_entering.baloth = False
+        if left:
+            for crea in actual_battlefield.creature_j_left:
+                if crea.baloth:
+                    add_counter_crea(crea, 2)
+        else:
+            for crea in actual_battlefield.creature_j_left:
+                if crea.baloth:
+                    add_counter_crea(crea, 2)
+        crea_entering.baloth = True
+        return
+    def draw_by_enchant (self, actual_battlefield, left):
+        possede_prerequis = False
+        if left:
+            for crea in actual_battlefield.creature_j_left:
+                if crea.actual_strength >= 4:
+                    possede_prerequis = True
+        else:
+            for crea in actual_battlefield.creature_j_right:
+                if crea.actual_strength >= 4:
+                    possede_prerequis = True
+        if possede_prerequis:
+            actual_battlefield.draw(left, 1)
         return
     def land_boost (self, crea, actual_battlefield):
         if crea.owner:
@@ -50,7 +105,10 @@ class Effect:
         else:
             crea.actual_life += actual_battlefield.nb_land_in_play_right
             crea.actual_strength += actual_battlefield.nb_land_in_play_right
-
+class Enchantment:
+    def __init__ (self, effect, cost):
+        self.effect = effect
+        self.actual_battlefield = None
 class Creature:
     def __init__ (self, strength, life, keywords, effect, cost):
         """Init of the creature class
@@ -74,6 +132,8 @@ class Creature:
         self.cost = cost
         self.summoning_sickness = True
         self.mana_producers = 0
+        self.baloth = False
+        self.delver = False
 
 class Land:
     def __init__ (self, color):
@@ -145,6 +205,8 @@ class Battlefield:
         self.mana_used_rights = 0
         self.creature_j_left = []
         self.creature_j_right = []
+        self.enchant_j_right = []
+        self.enchant_j_left = []
         self.deck_j_left = deck_j_left
         self.deck_j_right = deck_j_right
         self.hand_j_left, self.hand_j_right = []
