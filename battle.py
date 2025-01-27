@@ -1,8 +1,11 @@
 """In this module, all int are positive. The goal of this module is to implement function to create and administrate a battlefield.  """
 
-from stack_v import *
-import random
-random.seed() #to give something that seem more random to use than only the random function (cause the random is hardcode)
+from random import *
+seed() #to give something that seem more random to use than only the random function (cause the random is hardcode)
+colors = ["green", "red", "blue", "white", "black", "colorless"]
+types = ["creature","artifact", "land", "enchantement", "instant", "sorcery"]
+keywords = ["vigilance", "trample", "reach", "flying", "deathtouch", "unblockable"] #actually there are 173 so... it can be long
+
 class Effect:
     def __init__ (self, upkeep_t, endstep_t, entering, dying, attacking):
         """init of the effect class
@@ -109,6 +112,7 @@ class Enchantment:
     def __init__ (self, effect, cost):
         self.effect = effect
         self.actual_battlefield = None
+        self.cost = cost
 class Creature:
     def __init__ (self, strength, life, keywords, effect, cost):
         """Init of the creature class
@@ -143,17 +147,7 @@ class Land:
             color (str): The color of mana that produce the land
         """
         self.color = color
-
-class Card:
-    def __init__ (self, c_type, name):
-        """Init of the Card class
-
-        Args:
-            c_type (str): The type of the card (like "Creature", "Instant"...)
-            name (str): The name of the card
-        """
-        self.c_type = c_type
-        self.name = name
+        self.cost = {}
 class Instant:
     def __init__(self, untap, nb_counter, trample, cost):
         """Init of the instant function
@@ -165,7 +159,7 @@ class Instant:
         """
         self.untap = untap
         self.nb_counter = nb_counter
-        self.target = target
+        self.target = None
         self.cost = cost
         self.trample = trample
     def execute (self, target, target_to_damage):
@@ -198,9 +192,9 @@ class Battlefield:
         """
         self.end = False
         self.winner = -1
-        self.life_j_left, self.life_j_right = 20
-        self.can_cast_sorcery_left, self.can_cast_sorcery_right = False
-        self.mana_by_crea_left, self.mana_by_crea_right = 0
+        self.life_j_left = self.life_j_right = 20
+        self.can_cast_sorcery_left = self.can_cast_sorcery_right = False
+        self.mana_by_crea_left = self.mana_by_crea_right = 0
         self.mana_used_left = 0
         self.mana_used_rights = 0
         self.creature_j_left = []
@@ -209,17 +203,25 @@ class Battlefield:
         self.enchant_j_left = []
         self.deck_j_left = deck_j_left
         self.deck_j_right = deck_j_right
-        self.hand_j_left, self.hand_j_right = []
-        self.gravyard_j_left, self.gravyard_j_right = []
-        self.nb_land_in_play_left, self.nb_land_in_play_right = 0
-        self.hand_size_left, self.hand_size_right = 7
-        self.upkeep_left, self.upkeep_right = []
-        self.combat_left, self.combat_right = []
+        self.hand_j_left = []
+        self.hand_j_right = []
+        self.gravyard_j_left = []
+        self.gravyard_j_right = []
+        self.nb_land_in_play_left = self.nb_land_in_play_right = 0
+        self.hand_size_left = self.hand_size_right = 7
+        self.upkeep_left =[]
+        self.upkeep_right = []
+        self.combat_left =[]
+        self.combat_right = []
         self.step = ["attack", "main", "block", "damage", "end step", "upkeep"]
-        self.trigger_effect_attack_left, self.trigger_effect_attack_right = []
-        self.trigger_effect_damage_left, self.trigger_effect_damage_right = []
-        self.trigger_effect_upkeep_left, self.trigger_effect_upkeep_right = []
-        self.trigger_effect_end_step_left, self.trigger_effect_end_step_right = []
+        self.trigger_effect_attack_left = []
+        self.trigger_effect_attack_right = []
+        self.trigger_effect_damage_left = []
+        self.trigger_effect_damage_right = []
+        self.trigger_effect_upkeep_left = []
+        self.trigger_effect_upkeep_right = []
+        self.trigger_effect_end_step_left = []
+        self.trigger_effect_end_step_right = []
     def is_playable (self, left, card):
         """A function to calcul if the card card is actually playable or not.
 
@@ -231,13 +233,13 @@ class Battlefield:
             bool : If the card is playable : True
         """
         if left:
-            for symbol in card.cost:
-                if (self.mana_by_crea_left + self.nb_land_in_play_left - self.mana_used_left) <= card.cost[symbol]:
+            for symbol in data_base[card.name].cost:
+                if (self.mana_by_crea_left + self.nb_land_in_play_left - self.mana_used_left) <= data_base[card.name].cost[symbol]:
                     return False
                 else:
                     return True
-        for symbol in card.cost: #here, this isn't the left player who want to play (python indentation)
-            if (self.mana_by_crea_left + self.nb_land_in_play_left - self.mana_used_left) <= card.cost[symbol]:
+        for symbol in data_base[card.name].cost: #here, this isn't the left player who want to play (python indentation)
+            if (self.mana_by_crea_left + self.nb_land_in_play_left - self.mana_used_left) <= data_base[card.name].cost[symbol]:
                 return False
             else:
                 return True
@@ -251,31 +253,56 @@ class Battlefield:
             n (int)): the number of card to draw
         """
         if left:
-            if len(deck_j_left < n): #to check if the player can draw (if not he loses the game)
-                win_the_game(False)
+            if (len(self.deck_j_left) < n): #to check if the player can draw (if not he loses the game)
+                self.winner = 0
             for i in range (n):
-                hand_j_left.append(deck_j_left.pop())
+                self.hand_j_left.append(self.deck_j_left.pop())
             return
-        if len(deck_j_right < n): #to check if the player can draw (if not he loses the game)
-                win_the_game(True)
+        if (len(self.deck_j_right) < n): #to check if the player can draw (if not he loses the game)
+                self.winner = 1
         for i in range (n):
-            hand_j_right.append(deck_j_right.pop())
+            self.hand_j_right.append(self.deck_j_right.pop())
         return
+    def untap_step (self, left):
+        """a function to do the untap step
 
+    Args:
+            left (bool): to know which player in his untap_step (True -> left)
+        """
+        if left:
+            self.mana_used_left = 0
+            for crea in self.creature_j_left:
+                if len(crea.mana_producers) > 0:
+                    if crea.summoning_sickness:
+                        self.mana_by_crea_left += 1
+                crea.summoning_sickness = False
+                if crea.can_untap:
+                    crea.is_tap = False
+            return
+        self.mana_used_right = 0
+        for crea in self.creature_j_right:
+            if len(crea.mana_producers) > 0:
+                if crea.summoning_sickness:
+                    self.mana_by_crea_right += 1
+            crea.summoning_sickness = False
+            if crea.can_untap:
+                crea.is_tap = False
+        return
+        
     def upkeep (self, left):
         """a function to do the upkeep step (untap, upkeep triggers, draw)
 
         Args:
             left (bool): the player who is in upkeep phase (True -> left)
         """
-        untap_step (self, left)
+        self.untap_step (left)
         if left:
             for eff in self.trigger_effect_upkeep_left:
                 eff.trigger()
         else:
             for eff in self.trigger_effect_upkeep_right:
                 eff.trigger()
-        draw (self, left, 1)
+        self.draw (left, 1)
 
     def clean_step (self):
         """a function tu od the clean_step (end of the endstep)
@@ -331,7 +358,6 @@ class Battlefield:
         Args:
             left (_type_): the player who want to play a land (True -> left)
         """
-        land_in_hand = []
         if left:
             for c in self.hand_j_left:
                 if c.c_type == "land":
@@ -354,11 +380,11 @@ class Battlefield:
         """
         tab = []
         if left:
-            for crea in creature_j_left:
+            for crea in self.creature_j_left:
                 if not(crea.summoning_sickness or crea.is_tap):
                     tab.append(crea)
         else:
-            for crea in creature_j_right:
+            for crea in self.creature_j_right:
                 if not(crea.summoning_sickness or crea.is_tap):
                     tab.append(crea)
         return tab
@@ -373,31 +399,6 @@ class Battlefield:
         if self.life_j_right < 1:
             return 1
         return -1
-    def untap_step (self, left):
-        """a function to do the untap step
-
-        Args:
-            left (bool): to know which player in his untap_step (True -> left)
-        """
-        if left:
-            self.mana_used_left = 0
-            for crea in self.creature_j_left:
-                if len(crea.mana_producers) > 0:
-                    if crea.summoning_sickness:
-                        self.mana_by_crea_left += 1
-                crea.summoning_sickness = False
-                if crea.can_untap:
-                    crea.is_tap = False
-            return
-        self.mana_used_right = 0
-        for crea in self.creature_j_right:
-            if len(crea.mana_producers) > 0:
-                if crea.summoning_sickness:
-                    self.mana_by_crea_right += 1
-            crea.summoning_sickness = False
-            if crea.can_untap:
-                crea.is_tap = False
-        return
     def main_phase (self, left):
         """a function to do a main phase
 
@@ -457,10 +458,10 @@ class Battlefield:
     def game_begin (self):
         """a function to init the game
         """
-        random.shuffle(self.deck_j_left)
-        random.shuffle(self.deck_j_right)
-        draw (True, 7)
-        draw (False, 7)
+        shuffle(self.deck_j_left)
+        shuffle(self.deck_j_right)
+        self.draw (True, 7)
+        self.draw (False, 7)
         return
     def new_turn (self, left):
         """a function to begin a new turn
@@ -477,7 +478,7 @@ class Battlefield:
         draw(left, 1)
         untap (left)
         return
-    def dying_creature (self, tab_left, tab_right):
+    def dying_creature (self):
         """a function to update the python list tab, adding the died creature
 
         Args:
@@ -486,10 +487,10 @@ class Battlefield:
         """
         for i in range (len(self.creature_j_left)):
             if self.creature_j_left[i].actual_life < 1:
-                tab_left.append(self.creature_j_left.pop([i]))
+                self.creature_j_left.pop([i])
         for i in range (len(self.creature_j_right)):
             if self.creature_j_right[i].actual_life < 1:
-                tab_right.append(self.creature_j_right.pop([i]))
+                self.creature_j_right.pop([i])
         return
 
 class Combat_phase:
@@ -501,7 +502,8 @@ class Combat_phase:
         """
         self.actual_battlefield = actual_battlefield
         self.attacking_creature = {}
-        self.died_creature_left, self.died_creature_right = []
+        self.died_creature_left = []
+        self.died_creature_right = []
     def reset (self):
         """a function to reset the combat phase
         """
@@ -518,7 +520,7 @@ class Combat_phase:
     def assign_damage (self):
         """a function to assign the damage after the block phase
         """
-        for crea in self.attacking_creature.keys:
+        for crea in self.attacking_creature.keys():
             if attacking_creature[crea] == []:
                 if crea.owner:
                     self.actual_battlefield.life_j_right -= crea.actual_strength
@@ -527,15 +529,15 @@ class Combat_phase:
             else:
                 crea.actual_life -= self.attacking_creature[crea].actual_strength
                 self.attacking_creature[crea].actual_life -= crea.actual_strength
-        dying_creature (self.died_creature)
+        self.actual_battlefield.dying_creature ()
     def died_effect (self):
         """a function to execute the died effect
         """
-        for crea in died_creature_left:
+        for crea in self.died_creature_left:
             c = self.died_creature.pop()
             self.actual_battlefield.creature_j_left.remove(c)
             c.died_effect()
-        for crea in died_creature_right:
+        for crea in self.died_creature_right:
             c = self.died_creature.pop()
             self.actual_battlefield.creature_j_right.remove(c)
             c.died_effect()
@@ -543,5 +545,31 @@ class Combat_phase:
     def finish (self):
         """a function to actualise if wheather or not the duel is finished
         """
-        if actual_battlefield.is_finish == -1:
-            actual_battlefield.end = True
+        if self.actual_battlefield.is_finish == -1:
+            self.actual_battlefield.end = True
+
+""" Définition de toutes les cartes utilisé.
+"""
+data_base = {}
+data_base ["Forest"] = Land("green")
+data_base ["Island"] = Land("blue")
+data_base ["Mountain"] = Land("red")
+data_base ["Swamp"] = Land("black")
+data_base ["Plain"] = Land("white")
+data_base ["Gigantosorus"] = Creature(10,10,[],[],{"green" : 5})
+data_base ["Umbling Baloth"] = Creature(4,4,[],[],{"green" : 4})
+data_base ["Sentinel Spider"] = Creature(4,4,["vigilance", "reach"],[],{"green" : 5})
+data_base ["Woodland Mystic"] = Creature(1,1,[],[],{"green" : 2})
+data_base ["Woodland Mystic"].mana_producers = 1
+data_base ["Ilysian Caryatid"] = Creature(1,1,[],[],{"green" : 2})
+data_base ["Ilysian Caryatid"].mana_producers = 1
+data_base ["Stony Strength"] = Instant(True, 1, False, {"green" : 1})
+data_base ["Rabid Bite"] = Instant(False, 0, False, {"green" : 2})
+data_base ["Epic Proportions"] = Instant(False, 5, True, {"green" : 6})
+data_base ["Wildwood Patrol"] = Creature(4,2,["trample"], [], {"green" : 3})
+data_base ["Affectionate Indrik"] = Creature(4,4,[], [Effect([],[],[True],[],[])], {"green" : 6})
+data_base ["Rampaging Brontodon"] = Creature(7,7, ["trample"], [Effect([],[],[],[],[True])], {"green" : 7})
+data_base ["Colossal Majesty"] = Enchantment([Effect([True],[],[],[],[])], {"green" : 3})
+data_base ["Baloth Packhunter"] = Creature(3,3,["trample"],[Effect([],[],[False, True],[],[])], {"green" : 4})
+data_base ["Baloth Packhunter"].baloth = True
+data_base ["Jungle Delver"] = Creature(1,1,[],[Effect([],[True],[],[],[])],{"green" : 1})

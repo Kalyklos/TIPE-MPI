@@ -1,4 +1,6 @@
 from battle import *
+from decks import *
+from carte import *
 
 list_algo = ["rdm_att"]
 
@@ -9,35 +11,35 @@ class Random_algo_att:
     def can_play (self):
         playable_card = []
         if self.left:
-            battlefield_play.play_land(left, battlefield_play.nb_land_play_left)
-            for c in battlefield_play.hand_j_left:
-                if is_playable(battlefield_play.can_cast_sorcery_left, battlefield_play.remaining_mana_left, c):
+            self.battlefield_play.play_land(self.left)
+            for c in self.battlefield_play.hand_j_left:
+                if self.battlefield_play.is_playable(self.left, c):
                     playable_card.append(c)
         else:
-            battlefield_play.play_land(left, battlefield_play.nb_land_play_right)
-            for c in battlefield_play.hand_j_right:
-                if is_playable(battlefield_play.can_cast_sorcery_right, battlefield_play.remaining_mana_right, c):
+            self.battlefield_play.play_land(self.left)
+            for c in self.battlefield_play.hand_j_right:
+                if is_playable(self.left, c):
                     playable_card.append(c)
         while len(playable_card) > 0:
-            random.shuffle(playable_card)
+            shuffle(playable_card)
             if self.left:
-                battlefield_play.play_a_card(battlefield_play.remaining_mana_left, playable_card.pop(), True)
+                self.battlefield_play.play_a_card(self.battlefield_play.remaining_mana_left, playable_card.pop(), True)
             else:
-                battlefield_play.play_a_card(battlefield_play.remaining_mana_right, playable_card.pop(), False)
+                self.battlefield_play.play_a_card(self.battlefield_play.remaining_mana_right, playable_card.pop(), False)
             playable_card = []
             if self.left:
-                for c in battlefield_play.hand_j_left:
-                    if is_playable(battlefield_play.can_cast_sorcery_left, battlefield_play.remaining_mana_left, c):
+                for c in self.battlefield_play.hand_j_left:
+                    if is_playable(self.battlefield_play.can_cast_sorcery_left, self.battlefield_play.remaining_mana_left, c):
                         playable_card.append(c)
             else:
-                for c in battlefield_play.hand_j_right:
-                    if is_playable(battlefield_play.can_cast_sorcery_right, battlefield_play.remaining_mana_right, c):
+                for c in self.battlefield_play.hand_j_right:
+                    if is_playable(self.battlefield_play.can_cast_sorcery_right, self.battlefield_play.remaining_mana_right, c):
                         playable_card.append(c)
         return
     def combat (self):
         com = Combat_phase (self.battlefield_play)
         com.reset()
-        com.attack_phase(self.battlefield_play.possible_attacking_creature(left))
+        com.attack_phase(self.battlefield_play.possible_attacking_creature(self.left))
         com.assign_damage()
         com.finish()
         com.died_effect()
@@ -70,9 +72,9 @@ class Multi_battlefield:
         self.victory = [0, 0] #victory[0] = nb de combat gagné par algo_1 et inversement
     def one_dual (self):
         current_battlefield = Battlefield (self.deck_1, self.deck_2)
-        if algo_indice_1 == 0:
+        if self.algo_indice_1 == 0:
             algo_1 = Random_algo_att (True, current_battlefield)
-        if algo_indice_2 == 0:
+        if self.algo_indice_2 == 0:
             algo_2 = Random_algo_att (False, current_battlefield)
         current_battlefield.game_begin()
         left = True       #l'algo_1 sera considéré comme joueur de gauche et commencera
@@ -87,9 +89,9 @@ class Multi_battlefield:
         self.victory[current_battlefield.winner] += 1
         return
     def multi_dual (self):
-        self.win_deck ((0,0),(0,0))  #win (deck 1 (beginer (y, n)), deck 2 (beginer (y, n)))
+        self.win_deck = ((0,0),(0,0))  #win (deck 1 (beginer (y, n)), deck 2 (beginer (y, n)))
         for i in range (self.nb_sim):
-            one_dual()
+            self.one_dual()
         self.win_deck[0][0] = self.victory[0]
         self.win_deck[1][0] = self.victory[1]
         self.victory = [0, 0]
@@ -100,3 +102,7 @@ class Multi_battlefield:
         self.win_deck[0][1] = self.victory[1]
         self.win_deck[1][1] = self.victory[0]
         return self.win_deck
+
+# PHASE DE TEST :
+multi = Multi_battlefield ((mono_green, mono_green.copy()),(0,0),1)
+multi.multi_dual()

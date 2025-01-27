@@ -5,10 +5,6 @@ Thèmes : "transition, transformation, conversion"
 2) => coder des algos + deck
 3) => coder algos représentant des stratégies sur les meilleurs algos précédent et ...
 
-M. Yildizoglu. “Introduction a` la theorie ´ des jeux”. Dunod. 2003
-https://www.yildizoglu.fr/livretj/
-https://books.google.fr/books?hl=fr&lr=&id=KaZG1yyzJn0C&oi=fnd&pg=PR5&dq=M.+Yildizoglu&ots=oIRw_gguTG&sig=kXPvCXDJ4uItKUpetU7FvFBizkY#v=onepage&q&f=false
-
 # calandar : 
 09/09/2024 => init du code de magic
 10/09/2024 => avancement du code
@@ -28,6 +24,7 @@ https://books.google.fr/books?hl=fr&lr=&id=KaZG1yyzJn0C&oi=fnd&pg=PR5&dq=M.+Yild
 16/12/2024 => code d'Instant et modif combat (died)
 06/01/2025 => code de mono green quasiment-fini
 13/01/2025 => mono green fini & travail sur les annexes
+20/01/2025 => fin des annexes
 # biblio :
 09/09/2024 => https://docs.python.org/3/tutorial/datastructures.html utilisé pour coder magic (info sur les dict py).
 10/09/2024 => https://mtg.fandom.com/wiki/Keyword_ability utilisé pour information sur magic.
