@@ -25,6 +25,7 @@ Thèmes : "transition, transformation, conversion"
 06/01/2025 => code de mono green quasiment-fini
 13/01/2025 => mono green fini & travail sur les annexes
 20/01/2025 => fin des annexes
+27/01/2025 => debbug et refonte deck
 # biblio :
 09/09/2024 => https://docs.python.org/3/tutorial/datastructures.html utilisé pour coder magic (info sur les dict py).
 10/09/2024 => https://mtg.fandom.com/wiki/Keyword_ability utilisé pour information sur magic.

@@ -190,7 +190,6 @@ class Battlefield:
             deck_j_left (dict): a magic deck
             deck_j_right (dict): a magic deck
         """
-        self.end = False
         self.winner = -1
         self.life_j_left = self.life_j_right = 20
         self.can_cast_sorcery_left = self.can_cast_sorcery_right = False
@@ -255,11 +254,13 @@ class Battlefield:
         if left:
             if (len(self.deck_j_left) < n): #to check if the player can draw (if not he loses the game)
                 self.winner = 0
+                return
             for i in range (n):
                 self.hand_j_left.append(self.deck_j_left.pop())
             return
         if (len(self.deck_j_right) < n): #to check if the player can draw (if not he loses the game)
                 self.winner = 1
+                return
         for i in range (n):
             self.hand_j_right.append(self.deck_j_right.pop())
         return

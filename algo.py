@@ -73,23 +73,23 @@ class Multi_battlefield:
     def one_dual (self):
         current_battlefield = Battlefield (self.deck_1, self.deck_2)
         if self.algo_indice_1 == 0:
-            algo_1 = Random_algo_att (True, current_battlefield)
+            self.algo_1 = Random_algo_att (True, current_battlefield)
         if self.algo_indice_2 == 0:
-            algo_2 = Random_algo_att (False, current_battlefield)
+            self.algo_2 = Random_algo_att (False, current_battlefield)
         current_battlefield.game_begin()
         left = True       #l'algo_1 sera considéré comme joueur de gauche et commencera
-        while not (current_battlefield.end):
+        while current_battlefield.winner == -1:
             current_battlefield.upkeep(left)
             if left:
-                algo_1.can_play()
-                algo_1.combat()
+                self.algo_1.can_play()
+                self.algo_1.combat()
             else:
-                algo_2.can_play()
-                algo_2.combat()
+                self.algo_2.can_play()
+                self.algo_2.combat()
         self.victory[current_battlefield.winner] += 1
         return
     def multi_dual (self):
-        self.win_deck = ((0,0),(0,0))  #win (deck 1 (beginer (y, n)), deck 2 (beginer (y, n)))
+        self.win_deck = [[0,0],[0,0]]  #win (deck 1 (beginer (y, n)), deck 2 (beginer (y, n)))
         for i in range (self.nb_sim):
             self.one_dual()
         self.win_deck[0][0] = self.victory[0]
