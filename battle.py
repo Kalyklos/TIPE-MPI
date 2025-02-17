@@ -31,6 +31,13 @@ class Effect:
     def execute_up (self):
         pass
     def execute_att (self, crea, actual_battlefield):
+        """Executes the attack effects 'boost by the number of lands' for a creature on the battlefield.
+
+    Args:
+        crea (Creature): The creature that is attacking.
+        actual_battlefield (Battlefield): The current state of the battlefield.
+    """
+
         for b in self.attacking:
             if b:
                 land_boost (self, crea, actual_battlefield)
@@ -48,6 +55,16 @@ class Effect:
         crea.actual_strength += nb
         return
     def delver_pay (self, left, actual_battlefield):
+        """Pay the Delver cost by distributing +1/+1 counters to Delver creatures based on available mana.
+
+    Args:
+        left (bool): Indicates which player's Delver creatures to affect (True for left player).
+        actual_battlefield (Battlefield): The current state of the battlefield.
+
+    The function cycles through Delver creatures, adding a +1/+1 counter for every 4 mana available,
+    until less than 4 mana remains.
+    """
+
         if left:
             mana_remaining = actual_battlefield.nb_land_in_play_left - actual_battlefield.mana_used_left #au pire 25 donc 6 tour de boucle while
             if mana_remaining > 3:
@@ -74,9 +91,24 @@ class Effect:
                 mana_remaining -= 4
         return
     def damage (self, target, ennemy):
+        """Inflicts damage to the enemy creature by reducing its actual life based on the target's actual strength.
+
+    Args:
+        target (Creature): The creature dealing the damage.
+        ennemy (Creature): The creature receiving the damage.
+    """
+
         ennemy.actual_life -= target.actual_strength
         return
     def add_baloth (self, crea_entering, left, actual_battlefield):
+        """Assigns the 'baloth' property to the entering creature and adds +2/+2 counters to existing Baloth creatures.
+
+    Args:
+        crea_entering (Creature): The creature entering the battlefield.
+        left (bool): Indicates whether the creature belongs to the left player (True) or right player (False).
+        actual_battlefield (Battlefield): The current state of the battlefield.
+    """
+
         crea_entering.baloth = False
         if left:
             for crea in actual_battlefield.creature_j_left:
@@ -89,6 +121,12 @@ class Effect:
         crea_entering.baloth = True
         return
     def draw_by_enchant (self, actual_battlefield, left):
+        """Draw one card if the player has a creature with power 4 or more.
+
+        Args:
+            actual_battlefield (Battlefield): the battlefield to draw from
+            left (bool): the player who want to draw (True -> left)
+        """
         possede_prerequis = False
         if left:
             for crea in actual_battlefield.creature_j_left:
@@ -110,6 +148,12 @@ class Effect:
             crea.actual_strength += actual_battlefield.nb_land_in_play_right
 class Enchantment:
     def __init__ (self, effect, cost):
+        """Init of the Enchantment class
+
+        Args:
+            effect (Effect): effect of the enchantment (upkeep, endstep, entering, dying)
+            cost (dict): dictionnaire of colors and the nombers of mana of that type in their cost (ex : "Green" : 5)
+        """
         self.effect = effect
         self.actual_battlefield = None
         self.cost = cost
