@@ -98,11 +98,11 @@ class Multi_battlefield:
         self.deck_1, self.deck_2 = self.deck_2, self.deck_1
         self.algo_1, self.algo_2 = self.algo_2, self.algo_1
         for i in range (self.nb_sim):
-            one_dual()
+            self.one_dual()
         self.win_deck[0][1] = self.victory[1]
         self.win_deck[1][1] = self.victory[0]
         return self.win_deck
 
 # PHASE DE TEST :
-multi = Multi_battlefield ((mono_green, mono_green.copy()),(0,0),1)
-multi.multi_dual()
+multi = Multi_battlefield ((mono_green, mono_green.copy()),(0,0),500)
+print(multi.multi_dual())
