@@ -1,7 +1,8 @@
 """In this module, all int are positive. The goal of this module is to implement function to create and administrate a battlefield.  """
 
 from random import *
-seed() #to give something that seem more random to use than only the random function (cause the random is hardcode)
+seed()
+
 colors = ["green", "red", "blue", "white", "black", "colorless"]
 types = ["creature","artifact", "land", "enchantement", "instant", "sorcery"]
 keywords = ["vigilance", "trample", "reach", "flying", "deathtouch", "unblockable"] #actually there are 173 so... it can be long
@@ -40,7 +41,7 @@ class Effect:
 
         for b in self.attacking:
             if b:
-                land_boost (self, crea, actual_battlefield)
+                self.land_boost (self, crea, actual_battlefield)
         return
     def add_counter_crea(crea, nb):
         """Put nb +1/+1 counter onto the creature crea
@@ -74,7 +75,7 @@ class Effect:
                         l_delver.append (crea)
                 cpt = 0
                 while mana_remaining > 3:
-                    add_counter_crea (l_delver[cpt])
+                    self.add_counter_crea (l_delver[cpt])
                     cpt = (cpt + 1) % len (l_delver)
                     mana_remaining -= 4
             return
@@ -86,7 +87,7 @@ class Effect:
                     l_delver.append (crea)
             cpt = 0
             while mana_remaining > 3:
-                add_counter_crea (l_delver[cpt])
+                self.add_counter_crea (l_delver[cpt])
                 cpt = (cpt + 1) % len (l_delver)
                 mana_remaining -= 4
         return
@@ -113,11 +114,11 @@ class Effect:
         if left:
             for crea in actual_battlefield.creature_j_left:
                 if crea.baloth:
-                    add_counter_crea(crea, 2)
+                    self.add_counter_crea(crea, 2)
         else:
             for crea in actual_battlefield.creature_j_left:
                 if crea.baloth:
-                    add_counter_crea(crea, 2)
+                    self.add_counter_crea(crea, 2)
         crea_entering.baloth = True
         return
     def draw_by_enchant (self, actual_battlefield, left):
@@ -352,10 +353,10 @@ class Battlefield:
     def clean_step (self):
         """a function tu od the clean_step (end of the endstep)
         """
-        for crea in creature_j_left:
+        for crea in self.creature_j_left:
             crea.actual_life = crea.life
             crea.actual_strength = crea.strength
-        for crea in creature_j_right:
+        for crea in self.creature_j_right:
             crea.actual_life = crea.life
             crea.actual_strength = crea.strength
         return
@@ -370,11 +371,11 @@ class Battlefield:
         if left:
             shuffle (self.hand_j_left)
             for i in range (n):
-                hand_j_left.pop()
+                self.hand_j_left.pop()
             return
         shuffle (self.hand_j_right)
         for i in range (n):
-            hand_j_right.pop()
+            self.hand_j_right.pop()
 
     def end_step (self, left):
         """a function to do the end step phase, whoes need the discard and clean_step functions
@@ -386,16 +387,16 @@ class Battlefield:
             None: the function doesn't return anything, the return is here only to stop the function
         """
         if left:
-            for eff in trigger_effect_end_step_left:
+            for eff in self.trigger_effect_end_step_left:
                 eff.trigger ()
             if (self.hand_size_left - len(self.hand_j_left)) < 0:
-                discard (self, left, (len(self.hand_j_left) - self.hand_size_left))
-            return clean_step ()
-        for eff in trigger_effect_end_step_right:
+                self.discard (self, left, (len(self.hand_j_left) - self.hand_size_left))
+            return self.clean_step ()
+        for eff in self.trigger_effect_end_step_right:
             eff.trigger ()
         if (self.hand_size_right - len(self.hand_j_right)) < 0:
-            discard (self, left, (len(self.hand_j_right) - self.hand_size_right))
-        return clean_step ()      
+            self.discard (self, left, (len(self.hand_j_right) - self.hand_size_right))
+        return self.clean_step ()      
 
     def play_land (self, left):
         """a function to play a single land
@@ -440,8 +441,10 @@ class Battlefield:
             int: 0 if the right player have win, 1 if the right player have win, else -1
         """
         if self.life_j_left < 1:
+            self.winner = 0
             return 0
         if self.life_j_right < 1:
+            self.winner = 1
             return 1
         return -1
     def main_phase (self, left):
@@ -485,8 +488,8 @@ class Battlefield:
                         mana_creature.append[crea]
                 for i in range (-remaining_by_land):
                     mana_creature[i].is_tap = True
-            hand_j_left.remove(card)
-            eff_etb (card, left)
+            self.hand_j_left.remove(card)
+            self.eff_etb (card, left)
             return                
         remaining_by_land = self.nb_land_in_play_right - mana_needed
         if remaining_by_land < 0:
@@ -496,8 +499,8 @@ class Battlefield:
                     mana_creature.append[crea]
             for i in range (-remaining_by_land):
                 mana_creature[i].is_tap = True
-        hand_j_right.remove(card)
-        eff_etb (card, left)
+        self.hand_j_right.remove(card)
+        self.eff_etb (card, left)
         return
     
     def game_begin (self):
@@ -516,12 +519,12 @@ class Battlefield:
         """
         if left:
             for i in self.upkeep_left:
-                eff_card(i, left)
+                self.eff_card(i, left)
         else:
             for i in self.upkeep_right:
-                eff_card(i, left)
-        draw(left, 1)
-        untap (left)
+                self.eff_card(i, left)
+        self.draw(left, 1)
+        self.untap (left)
         return
     def dying_creature (self):
         """a function to update the python list tab, adding the died creature
@@ -566,7 +569,7 @@ class Combat_phase:
         """a function to assign the damage after the block phase
         """
         for crea in self.attacking_creature.keys():
-            if attacking_creature[crea] == []:
+            if self.attacking_creature[crea] == []:
                 if crea.owner:
                     self.actual_battlefield.life_j_right -= crea.actual_strength
                 else:
@@ -574,6 +577,7 @@ class Combat_phase:
             else:
                 crea.actual_life -= self.attacking_creature[crea].actual_strength
                 self.attacking_creature[crea].actual_life -= crea.actual_strength
+        self.actual_battlefield.is_finish ()
         self.actual_battlefield.dying_creature ()
     def died_effect (self):
         """a function to execute the died effect
@@ -586,12 +590,9 @@ class Combat_phase:
             c = self.died_creature.pop()
             self.actual_battlefield.creature_j_right.remove(c)
             c.died_effect()
-        
+        self.actual_battlefield.is_finish ()
     def finish (self):
-        """a function to actualise if wheather or not the duel is finished
-        """
-        if self.actual_battlefield.is_finish == -1:
-            self.actual_battlefield.end = True
+        self.actual_battlefield.is_finish()
 
 """ Définition de toutes les cartes utilisé.
 """

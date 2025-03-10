@@ -39,7 +39,7 @@ class Random_algo_att:
         else:
             self.battlefield_play.play_land(self.left)
             for c in self.battlefield_play.hand_j_right:
-                if is_playable(self.left, c):
+                if self.battlefield_play.is_playable(self.left, c):
                     playable_card.append(c)
         while len(playable_card) > 0:
             shuffle(playable_card)
@@ -50,11 +50,11 @@ class Random_algo_att:
             playable_card = []
             if self.left:
                 for c in self.battlefield_play.hand_j_left:
-                    if is_playable(self.battlefield_play.can_cast_sorcery_left, self.battlefield_play.remaining_mana_left, c):
+                    if self.battlefield_play.is_playable(self.battlefield_play.can_cast_sorcery_left, self.battlefield_play.remaining_mana_left, c):
                         playable_card.append(c)
             else:
                 for c in self.battlefield_play.hand_j_right:
-                    if is_playable(self.battlefield_play.can_cast_sorcery_right, self.battlefield_play.remaining_mana_right, c):
+                    if self.battlefield_play.is_playable(self.battlefield_play.can_cast_sorcery_right, self.battlefield_play.remaining_mana_right, c):
                         playable_card.append(c)
         return
     def combat (self):
@@ -74,7 +74,7 @@ class Random_algo_att:
         Boost a random creature in the board of the player who is playing,
         by adding the given strength and life.
         """
-        if left:
+        if self.left:
             if len(self.battlefield_play.board_j_left) > 0:
                 random.shuffle(self.battlefield_play.board_j_left)
                 c = self.battlefield_play.board_j_left[0]
@@ -105,7 +105,6 @@ class Multi_battlefield:
         self.deck_1, self.deck_2 = deck_couple
         self.nb_sim = nb_sim
         self.algo_indice_1, self.algo_indice_2 = algo_indice_couple
-        self.victory = [0, 0] #victory[0] = nb de combat gagné par algo_1 et inversement
     def one_dual (self):
         """ Simulates a single duel between two decks using specified algorithms.
     This function initializes a battlefield with the given decks and assigns
@@ -116,7 +115,6 @@ class Multi_battlefield:
     The left player always starts first, and the game continues until one of
     the player wins.
     """
-
         current_battlefield = Battlefield (self.deck_1, self.deck_2)
         if self.algo_indice_1 == 0:
             self.algo_1 = Random_algo_att (True, current_battlefield)
@@ -132,43 +130,24 @@ class Multi_battlefield:
             else:
                 self.algo_2.can_play()
                 self.algo_2.combat()
-        self.victory[current_battlefield.winner] += 1
-        return
+            left = not left
+        return current_battlefield.winner
     def multi_dual (self):
-        """
-        Simulates multiple duels between two decks using specified algorithms.
-
-        This function initializes the number of victories for each deck to 0 and
-        then runs the one_dual function nb_sim times. After each duel, the
-        number of victories for the winner is incremented. The decks and algorithms are then
-        swapped to change the starting player and the same process is repeated. The final number of victories
-        for each deck is returned as a list of lists. The outer list has two
-        elements, the first one being the number of victories for deck 1 and the
-        second one being the number of victories for deck 2. The inner lists have
-        two elements each, the first one being the number of victories when the
-        deck starts and the second one being the number of victories when the
-        deck does not start.
-
-        Args:
-            None
-
-        Returns:
-            A list of lists containing the number of victories for each deck.
-
-        """
-        self.win_deck = [[0,0],[0,0]]  #win (deck 1 (beginer (y, n)), deck 2 (beginer (y, n)))
+        
+        self.nb_victory_algo_1_start = self.nb_victory_algo_2_start = self.nb_victory_algo_1_2nd = self.nb_victory_algo_2_2nd = 0
         for i in range (self.nb_sim):
-            self.one_dual()
-        self.win_deck[0][0] = self.victory[0]
-        self.win_deck[1][0] = self.victory[1]
-        self.victory = [0, 0]
+            if self.one_dual ():
+                self.nb_victory_algo_1_start += 1
+            else:
+                self.nb_victory_algo_2_2nd += 1
+        self.algo_indice_1, self.algo_indice_2 = self.algo_indice_2, self.algo_indice_1
         self.deck_1, self.deck_2 = self.deck_2, self.deck_1
-        self.algo_1, self.algo_2 = self.algo_2, self.algo_1
         for i in range (self.nb_sim):
-            self.one_dual()
-        self.win_deck[0][1] = self.victory[1]
-        self.win_deck[1][1] = self.victory[0]
-        return self.win_deck
+            if self.one_dual ():
+                self.nb_victory_algo_2_start += 1
+            else:
+                self.nb_victory_algo_1_2nd += 1
+        return f"L'algo 1 a gagné {self.nb_victory_algo_1_start} en commençant et {self.nb_victory_algo_1_2nd} en jouant en 2ème avec le deck {str(self.deck_1)}. L'algo 2 a gagné {self.nb_victory_algo_2_start} en commençant et {self.nb_victory_algo_2_2nd} en jouant en 2ème avec le deck {str(self.deck_2)}."
 
 # PHASE DE TEST :
 multi = Multi_battlefield ((mono_green, mono_green.copy()),(0,0),500)
