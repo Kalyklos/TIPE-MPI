@@ -29,6 +29,7 @@ Thèmes : "transition, transformation, conversion"
 03/02/2025 => tests des algos et premières données
 10/02/2025 => re-install de Linux et config + code
 17/02/2025 => docstring + debbug
+10/03/2025 => recherche disfonctionnement du générateur pseudo-aléatoire
 # biblio :
 09/09/2024 => https://docs.python.org/3/tutorial/datastructures.html utilisé pour coder magic (info sur les dict py).
 10/09/2024 => https://mtg.fandom.com/wiki/Keyword_ability utilisé pour information sur magic.
