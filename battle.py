@@ -158,6 +158,7 @@ class Enchantment:
         self.effect = effect
         self.actual_battlefield = None
         self.cost = cost
+        self.type = "enchantment"
 class Creature:
     def __init__ (self, strength, life, keywords, effect, cost):
         """Init of the creature class
@@ -169,6 +170,7 @@ class Creature:
             effect (Effect): effect of the creature (upkeep, endstep, entering, dying)
             cost (dict): dictionnaire of colors and the nombers of mana of that type in their cost (ex : "Green" : 5)
         """
+        self.type = "creature"
         self.strength = strength
         self.life = life
         self.keywords = keywords
@@ -191,8 +193,9 @@ class Land:
         Args:
             color (str): The color of mana that produce the land
         """
+        self.type = "land"
         self.color = color
-        self.cost = {}
+        self.cost = {"green" : 1000} #to don't play a land as a spell
 class Instant:
     def __init__(self, untap, nb_counter, trample, cost):
         """Init of the instant function
@@ -202,6 +205,8 @@ class Instant:
             nb_counter_plus (int): The number of counter +1/+1 to put on the target(s)
             cost (dict): dictionnaire of colors and the nombers of mana of that type in their cost (ex : "Green" : 5)
         """
+        self.effect = Effect([],[],[],[],[]) #to do : faire un truc propre ici
+        self.type = "instant"
         self.untap = untap
         self.nb_counter = nb_counter
         self.target = None
@@ -277,13 +282,13 @@ class Battlefield:
             bool : If the card is playable : True
         """
         if left:
-            for symbol in data_base[card.name].cost:
-                if (self.mana_by_crea_left + self.nb_land_in_play_left - self.mana_used_left) <= data_base[card.name].cost[symbol]:
+            for symbol in card.cost:
+                if (self.mana_by_crea_left + self.nb_land_in_play_left - self.mana_used_left) <= card.cost[symbol]:
                     return False
                 else:
                     return True
-        for symbol in data_base[card.name].cost: #here, this isn't the left player who want to play (python indentation)
-            if (self.mana_by_crea_left + self.nb_land_in_play_left - self.mana_used_left) <= data_base[card.name].cost[symbol]:
+        for symbol in card.cost: #here, this isn't the left player who want to play (python indentation)
+            if (self.mana_by_crea_left + self.nb_land_in_play_left - self.mana_used_left) <= card.cost[symbol]:
                 return False
             else:
                 return True
@@ -297,6 +302,7 @@ class Battlefield:
             n (int)): the number of card to draw
         """
         if left:
+            print(len(self.deck_j_left))
             if (len(self.deck_j_left) < n): #to check if the player can draw (if not he loses the game)
                 self.winner = 0
                 return
@@ -406,15 +412,15 @@ class Battlefield:
         """
         if left:
             for c in self.hand_j_left:
-                if c.c_type == "land":
+                if c.type == "land":
                     self.nb_land_in_play_left +=1
                     self.hand_j_left.remove(c)
-                    return                       #the return stop the funtcion in order to not play another land
+                    return                       #the return stop the function in order to not play another land
         for c in self.hand_j_right:
-            if c.c_type == "land":
+            if c.type == "land":
                 self.nb_land_in_play_right +=1
                 self.hand_j_right.remove(c)
-                return                           #the return stop the funtcion in order to not play another land
+                return                           #the return stop the function in order to not play another land
     def possible_attacking_creature(self, left):
         """a function to know which creature are able to attack
 
@@ -489,7 +495,7 @@ class Battlefield:
                 for i in range (-remaining_by_land):
                     mana_creature[i].is_tap = True
             self.hand_j_left.remove(card)
-            self.eff_etb (card, left)
+            card.effect.execute_enter()
             return                
         remaining_by_land = self.nb_land_in_play_right - mana_needed
         if remaining_by_land < 0:
@@ -500,7 +506,7 @@ class Battlefield:
             for i in range (-remaining_by_land):
                 mana_creature[i].is_tap = True
         self.hand_j_right.remove(card)
-        self.eff_etb (card, left)
+        card.effect.execute_enter()
         return
     
     def game_begin (self):
@@ -510,6 +516,7 @@ class Battlefield:
         shuffle(self.deck_j_right)
         self.draw (True, 7)
         self.draw (False, 7)
+        self.winner = -1
         return
     def new_turn (self, left):
         """a function to begin a new turn
@@ -602,20 +609,40 @@ data_base ["Island"] = Land("blue")
 data_base ["Mountain"] = Land("red")
 data_base ["Swamp"] = Land("black")
 data_base ["Plain"] = Land("white")
-data_base ["Gigantosorus"] = Creature(10,10,[],[],{"green" : 5})
-data_base ["Umbling Baloth"] = Creature(4,4,[],[],{"green" : 4})
-data_base ["Sentinel Spider"] = Creature(4,4,["vigilance", "reach"],[],{"green" : 5})
-data_base ["Woodland Mystic"] = Creature(1,1,[],[],{"green" : 2})
+data_base ["Gigantosorus"] = Creature(10,10,[],Effect([],[],[],[],[]),{"green" : 5})
+data_base ["Umbling Baloth"] = Creature(4,4,[],Effect([],[],[],[],[]),{"green" : 4})
+data_base ["Sentinel Spider"] = Creature(4,4,["vigilance", "reach"],Effect([],[],[],[],[]),{"green" : 5})
+data_base ["Woodland Mystic"] = Creature(1,1,[],Effect([],[],[],[],[]),{"green" : 2})
 data_base ["Woodland Mystic"].mana_producers = 1
-data_base ["Ilysian Caryatid"] = Creature(1,1,[],[],{"green" : 2})
+data_base ["Ilysian Caryatid"] = Creature(1,1,[],Effect([],[],[],[],[]),{"green" : 2})
 data_base ["Ilysian Caryatid"].mana_producers = 1
 data_base ["Stony Strength"] = Instant(True, 1, False, {"green" : 1})
 data_base ["Rabid Bite"] = Instant(False, 0, False, {"green" : 2})
 data_base ["Epic Proportions"] = Instant(False, 5, True, {"green" : 6})
-data_base ["Wildwood Patrol"] = Creature(4,2,["trample"], [], {"green" : 3})
-data_base ["Affectionate Indrik"] = Creature(4,4,[], [Effect([],[],[True],[],[])], {"green" : 6})
-data_base ["Rampaging Brontodon"] = Creature(7,7, ["trample"], [Effect([],[],[],[],[True])], {"green" : 7})
-data_base ["Colossal Majesty"] = Enchantment([Effect([True],[],[],[],[])], {"green" : 3})
-data_base ["Baloth Packhunter"] = Creature(3,3,["trample"],[Effect([],[],[False, True],[],[])], {"green" : 4})
+data_base ["Wildwood Patrol"] = Creature(4,2,["trample"], Effect([],[],[],[],[]), {"green" : 3})
+data_base ["Affectionate Indrik"] = Creature(4,4,[], Effect([],[],[True],[],[]), {"green" : 6})
+data_base ["Rampaging Brontodon"] = Creature(7,7, ["trample"], Effect([],[],[],[],[True]), {"green" : 7})
+data_base ["Colossal Majesty"] = Enchantment(Effect([True],[],[],[],[]), {"green" : 3})
+data_base ["Baloth Packhunter"] = Creature(3,3,["trample"],Effect([],[],[False, True],[],[]), {"green" : 4})
 data_base ["Baloth Packhunter"].baloth = True
-data_base ["Jungle Delver"] = Creature(1,1,[],[Effect([],[True],[],[],[])],{"green" : 1})
+data_base ["Jungle Delver"] = Creature(1,1,[],Effect([],[True],[],[],[]),{"green" : 1})
+
+mono_green = [] #check why their are only 56 cards in this deck
+for i in range (4):
+    mono_green.append(data_base["Gigantosorus"])
+    mono_green.append(data_base["Baloth Packhunter"])
+    mono_green.append(data_base["Ilysian Caryatid"])
+for i in range (2):
+    mono_green.append(data_base["Umbling Baloth"])
+    mono_green.append(data_base["Woodland Mystic"])
+    mono_green.append(data_base["Sentinel Spider"])
+    mono_green.append(data_base["Wildwood Patrol"])
+    mono_green.append(data_base["Affectionate Indrik"])
+    mono_green.append(data_base["Colossal Majesty"])
+    mono_green.append(data_base["Stony Strength"])
+for i in range (25):
+    mono_green.append(data_base["Forest"])
+for i in range (3):
+    mono_green.append(data_base["Rabid Bite"])
+mono_green.append(data_base["Epic Proportions"])
+mono_green.append(data_base["Rampaging Brontodon"])

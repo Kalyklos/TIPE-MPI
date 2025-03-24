@@ -25,11 +25,12 @@ Thèmes : "transition, transformation, conversion"
 06/01/2025 => code de mono green quasiment-fini
 13/01/2025 => mono green fini & travail sur les annexes
 20/01/2025 => fin des annexes
-27/01/2025 => debbug et refonte deck
+27/01/2025 => debugg et refonte deck
 03/02/2025 => tests des algos et premières données
 10/02/2025 => re-install de Linux et config + code
-17/02/2025 => docstring + debbug
+17/02/2025 => docstring + debugg
 10/03/2025 => recherche disfonctionnement du générateur pseudo-aléatoire
+24/03/2025 => pas d'erreur sur le générateur pseudo-aléatoire, recherche de l'erreur (ne finit que sur la pioche), debugg, implémentation algo
 # biblio :
 09/09/2024 => https://docs.python.org/3/tutorial/datastructures.html utilisé pour coder magic (info sur les dict py).
 10/09/2024 => https://mtg.fandom.com/wiki/Keyword_ability utilisé pour information sur magic.

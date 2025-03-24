@@ -1,5 +1,4 @@
 from battle import *
-from decks import *
 from carte import *
 
 list_algo = ["rdm_att"]
@@ -44,22 +43,22 @@ class Random_algo_att:
         while len(playable_card) > 0:
             shuffle(playable_card)
             if self.left:
-                self.battlefield_play.play_a_card(self.battlefield_play.remaining_mana_left, playable_card.pop(), True)
+                self.battlefield_play.play_a_card(playable_card.pop(), True)
             else:
-                self.battlefield_play.play_a_card(self.battlefield_play.remaining_mana_right, playable_card.pop(), False)
+                self.battlefield_play.play_a_card(playable_card.pop(), False)
             playable_card = []
             if self.left:
                 for c in self.battlefield_play.hand_j_left:
-                    if self.battlefield_play.is_playable(self.battlefield_play.can_cast_sorcery_left, self.battlefield_play.remaining_mana_left, c):
+                    if self.battlefield_play.is_playable(self.left, c):
                         playable_card.append(c)
             else:
                 for c in self.battlefield_play.hand_j_right:
-                    if self.battlefield_play.is_playable(self.battlefield_play.can_cast_sorcery_right, self.battlefield_play.remaining_mana_right, c):
+                    if self.battlefield_play.is_playable(self.left, c):
                         playable_card.append(c)
         return
     def combat (self):
         """
-    Executes the combat phase.
+    Execute the combat phase.
     """
         com = Combat_phase (self.battlefield_play)
         com.reset()
@@ -147,8 +146,8 @@ class Multi_battlefield:
                 self.nb_victory_algo_2_start += 1
             else:
                 self.nb_victory_algo_1_2nd += 1
-        return f"L'algo 1 a gagné {self.nb_victory_algo_1_start} en commençant et {self.nb_victory_algo_1_2nd} en jouant en 2ème avec le deck {str(self.deck_1)}. L'algo 2 a gagné {self.nb_victory_algo_2_start} en commençant et {self.nb_victory_algo_2_2nd} en jouant en 2ème avec le deck {str(self.deck_2)}."
+        return f"L'algo 1 a gagné {self.nb_victory_algo_1_start} en commençant et {self.nb_victory_algo_1_2nd} en jouant en 2ème avec le deck mono-green. L'algo 2 a gagné {self.nb_victory_algo_2_start} en commençant et {self.nb_victory_algo_2_2nd} en jouant en 2ème avec le deck mono-green."
 
 # PHASE DE TEST :
-multi = Multi_battlefield ((mono_green, mono_green.copy()),(0,0),500)
+multi = Multi_battlefield ((mono_green.copy(), mono_green.copy()),(0,0),2)
 print(multi.multi_dual())
