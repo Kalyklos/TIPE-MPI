@@ -282,13 +282,21 @@ class Battlefield:
             bool : If the card is playable : True
         """
         if left:
+            mana_creature = []
+            for crea in self.creature_j_left:
+                    if crea.mana_producers > 0 and not crea.summoning_sickness and not crea.is_tap:
+                        mana_creature.append[crea]
             for symbol in card.cost:
-                if (self.mana_by_crea_left + self.nb_land_in_play_left - self.mana_used_left) <= card.cost[symbol]:
+                if (len(mana_creature) + self.nb_land_in_play_left - self.mana_used_left) <= card.cost[symbol]:
                     return False
                 else:
                     return True
+        mana_creature = []
+        for crea in self.creature_j_right:
+                if crea.mana_producers > 0 and not crea.summoning_sickness and not crea.is_tap:
+                    mana_creature.append[crea]
         for symbol in card.cost: #here, this isn't the left player who want to play (python indentation)
-            if (self.mana_by_crea_left + self.nb_land_in_play_left - self.mana_used_left) <= card.cost[symbol]:
+            if (len(mana_creature) + self.nb_land_in_play_left - self.mana_used_left) <= card.cost[symbol]:
                 return False
             else:
                 return True

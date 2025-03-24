@@ -114,7 +114,7 @@ class Multi_battlefield:
     The left player always starts first, and the game continues until one of
     the player wins.
     """
-        current_battlefield = Battlefield (self.deck_1, self.deck_2)
+        current_battlefield = Battlefield (self.deck_1.copy(), self.deck_2.copy())
         if self.algo_indice_1 == 0:
             self.algo_1 = Random_algo_att (True, current_battlefield)
         if self.algo_indice_2 == 0:
@@ -149,5 +149,5 @@ class Multi_battlefield:
         return f"L'algo 1 a gagné {self.nb_victory_algo_1_start} en commençant et {self.nb_victory_algo_1_2nd} en jouant en 2ème avec le deck mono-green. L'algo 2 a gagné {self.nb_victory_algo_2_start} en commençant et {self.nb_victory_algo_2_2nd} en jouant en 2ème avec le deck mono-green."
 
 # PHASE DE TEST :
-multi = Multi_battlefield ((mono_green.copy(), mono_green.copy()),(0,0),2)
+multi = Multi_battlefield ((mono_green, mono_green),(0,0),2)
 print(multi.multi_dual())
