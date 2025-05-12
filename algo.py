@@ -146,7 +146,7 @@ class Multi_battlefield:
                 self.nb_victory_algo_2_start += 1
             else:
                 self.nb_victory_algo_1_2nd += 1
-        return f"L'algo 1 a gagné {self.nb_victory_algo_1_start} en commençant et {self.nb_victory_algo_1_2nd} en jouant en 2ème avec le deck mono-green. L'algo 2 a gagné {self.nb_victory_algo_2_start} en commençant et {self.nb_victory_algo_2_2nd} en jouant en 2ème avec le deck mono-green."
+        return f"L'algo 1 a gagné {self.nb_victory_algo_1_start} fois en commençant et {self.nb_victory_algo_1_2nd} fois en jouant en 2ème avec le deck mono-green. L'algo 2 a gagné {self.nb_victory_algo_2_start} fois en commençant et {self.nb_victory_algo_2_2nd} fois en jouant en 2ème avec le deck mono-green."
 
 # PHASE DE TEST :
 multi = Multi_battlefield ((mono_green, mono_green),(0,0),2)
