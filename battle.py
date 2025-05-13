@@ -243,7 +243,6 @@ class Battlefield:
         self.winner = -1
         self.life_j_left = self.life_j_right = 20
         self.can_cast_sorcery_left = self.can_cast_sorcery_right = False
-        self.mana_by_crea_left = self.mana_by_crea_right = 0
         self.mana_used_left = 0
         self.mana_used_rights = 0
         self.creature_j_left = []
@@ -284,22 +283,23 @@ class Battlefield:
         if left:
             mana_creature = []
             for crea in self.creature_j_left:
-                    if crea.mana_producers > 0 and not crea.summoning_sickness and not crea.is_tap:
+                    if crea.mana_producers > 0 and (not crea.summoning_sickness) and (not crea.is_tap):
                         mana_creature.append[crea]
-            for symbol in card.cost:
-                if (len(mana_creature) + self.nb_land_in_play_left - self.mana_used_left) <= card.cost[symbol]:
-                    return False
-                else:
+            if len(mana_creature) + self.nb_land_in_play_left - self.mana_used_left - card.cost >= 0:
+                    print("Left has mana_producers", mana_creature, len(mana_creature))          
+                    print("Left has ", self.nb_land_in_play_left, "land in play and ", self.mana_used_left, " mana used")
+                    print("So Left has ", len(mana_creature) + self.nb_land_in_play_left - self.mana_used_left, "mana and need ", card.cost, "mana : the card is playable")
                     return True
+            return False
         mana_creature = []
         for crea in self.creature_j_right:
-                if crea.mana_producers > 0 and not crea.summoning_sickness and not crea.is_tap:
+                if crea.mana_producers > 0 and (not crea.summoning_sickness) and (not crea.is_tap):
                     mana_creature.append[crea]
-        for symbol in card.cost: #here, this isn't the left player who want to play (python indentation)
-            if (len(mana_creature) + self.nb_land_in_play_left - self.mana_used_left) <= card.cost[symbol]:
-                return False
-            else:
-                return True
+        if len(mana_creature) + self.nb_land_in_play_left - self.mana_used_left - card.cost >= 0:
+            print("Right has mana_producers", mana_creature, len(mana_creature))
+            print("Right has ", self.nb_land_in_play_right, "land in play and ", self.mana_used_right, " mana used")
+            print("So Right has ", len(mana_creature) + self.nb_land_in_play_right - self.mana_used_right, "mana and need ", card.cost, "mana : the card is playable")
+            return True
         return False
         
     def draw (self, left, n):
@@ -310,7 +310,6 @@ class Battlefield:
             n (int)): the number of card to draw
         """
         if left:
-            print(len(self.deck_j_left))
             if (len(self.deck_j_left) < n): #to check if the player can draw (if not he loses the game)
                 self.winner = 0
                 return
@@ -332,18 +331,12 @@ class Battlefield:
         if left:
             self.mana_used_left = 0
             for crea in self.creature_j_left:
-                if len(crea.mana_producers) > 0:
-                    if crea.summoning_sickness:
-                        self.mana_by_crea_left += 1
                 crea.summoning_sickness = False
                 if crea.can_untap:
                     crea.is_tap = False
             return
         self.mana_used_right = 0
         for crea in self.creature_j_right:
-            if len(crea.mana_producers) > 0:
-                if crea.summoning_sickness:
-                    self.mana_by_crea_right += 1
             crea.summoning_sickness = False
             if crea.can_untap:
                 crea.is_tap = False
@@ -484,38 +477,36 @@ class Battlefield:
         self.creature_j_right.append(crea)
         return
     def play_a_card (self, card, left):
-        """a function to play the card card, the card to play is supposed playable
+        """a function to play the card card, THE CARD MUST BE PLAYABLE
 
         Args:
-            card (Card): a magic card from the Card class
+            card : a magic card from a class
             left (bool): to know which player want to play (True -> left)
         """
-        mana_needed = 0
-        for symbol in card.cost:
-            mana_needed += card.cost[symbol]
+        assert self.is_playable(left, card), "The card is not playable"
         if left:
-            remaining_by_land = self.nb_land_in_play_left - mana_needed
-            if remaining_by_land < 0:
+            remaining = self.nb_land_in_play_left - self.mana_used_left - card.cost
+            if remaining < 0:
                 mana_creature = []
                 for crea in self.creature_j_left:
                     if crea.mana_producers > 0 and not crea.summoning_sickness and not crea.is_tap:
                         mana_creature.append[crea]
-                for i in range (-remaining_by_land):
+                for i in range (-remaining):
                     mana_creature[i].is_tap = True
             self.hand_j_left.remove(card)
             card.effect.execute_enter()
             return                
-        remaining_by_land = self.nb_land_in_play_right - mana_needed
-        if remaining_by_land < 0:
+        remaining = self.nb_land_in_play_right - self.mana_used_right - card.cost
+        if remaining < 0:
             mana_creature = []
             for crea in self.creature_j_right:
                 if crea.mana_producers > 0 and not crea.summoning_sickness and not crea.is_tap:
                     mana_creature.append[crea]
-            for i in range (-remaining_by_land-1):
+            for i in range (-remaining):
                 mana_creature[i].is_tap = True
         self.hand_j_right.remove(card)
         card.effect.execute_enter()
-        return
+        return 
     
     def game_begin (self):
         """a function to init the game

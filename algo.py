@@ -13,7 +13,7 @@ class Random_algo_att:
         """
         self.left = left
         self.battlefield_play = battlefield_play
-    def can_play (self):
+    def can_play (self, have_play_land):
         """
     Determines the playable cards for the current player and plays them.
 
@@ -27,33 +27,21 @@ class Random_algo_att:
     Returns:
         None
     """
-
+        if not have_play_land:
+            self.battlefield_play.play_land(self.left)
         playable_card = []
         if self.left:
-            self.battlefield_play.play_land(self.left)
             for c in self.battlefield_play.hand_j_left:
                 if self.battlefield_play.is_playable(self.left, c):
                     playable_card.append(c)
         else:
-            self.battlefield_play.play_land(self.left)
             for c in self.battlefield_play.hand_j_right:
                 if self.battlefield_play.is_playable(self.left, c):
                     playable_card.append(c)
-        while len(playable_card) > 0:
+        if len(playable_card) > 0:
             shuffle(playable_card)
-            if self.left:
-                self.battlefield_play.play_a_card(playable_card.pop(), True)
-            else:
-                self.battlefield_play.play_a_card(playable_card.pop(), False)
-            playable_card = []
-            if self.left:
-                for c in self.battlefield_play.hand_j_left:
-                    if self.battlefield_play.is_playable(self.left, c):
-                        playable_card.append(c)
-            else:
-                for c in self.battlefield_play.hand_j_right:
-                    if self.battlefield_play.is_playable(self.left, c):
-                        playable_card.append(c)
+            self.battlefield_play.play_a_card(playable_card.pop(), self.left)
+            self.can_play(True)
         return
     def combat (self):
         """
@@ -123,10 +111,10 @@ class Multi_battlefield:
         while current_battlefield.winner == -1:
             current_battlefield.upkeep(left)
             if left:
-                self.algo_1.can_play()
+                self.algo_1.can_play(False)
                 self.algo_1.combat()
             else:
-                self.algo_2.can_play()
+                self.algo_2.can_play(False)
                 self.algo_2.combat()
             left = not left
         return current_battlefield.winner
