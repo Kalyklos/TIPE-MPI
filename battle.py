@@ -153,7 +153,7 @@ class Enchantment:
 
         Args:
             effect (Effect): effect of the enchantment (upkeep, endstep, entering, dying)
-            cost (dict): dictionnaire of colors and the nombers of mana of that type in their cost (ex : "Green" : 5)
+            cost (int): cost of the enchantment (in mana)
         """
         self.effect = effect
         self.actual_battlefield = None
@@ -168,8 +168,7 @@ class Creature:
             life (int): toughness of the creature
             keywords (tab of str): keywords of the creature (like Trample, Flying...)
             effect (Effect): effect of the creature (upkeep, endstep, entering, dying)
-            cost (dict): dictionnaire of colors and the nombers of mana of that type in their cost (ex : "Green" : 5)
-        """
+            cost (int): cost of the creature (in mana)   """
         self.type = "creature"
         self.strength = strength
         self.life = life
@@ -195,7 +194,7 @@ class Land:
         """
         self.type = "land"
         self.color = color
-        self.cost = {"green" : 1000} #to don't play a land as a spell
+        self.cost = 1000 #to don't play a land as a spell
 class Instant:
     def __init__(self, untap, nb_counter, trample, cost):
         """Init of the instant function
@@ -203,9 +202,10 @@ class Instant:
         Args:
             untap (bool): To know if the instant untap the target(s) (True -> Yes)
             nb_counter_plus (int): The number of counter +1/+1 to put on the target(s)
-            cost (dict): dictionnaire of colors and the nombers of mana of that type in their cost (ex : "Green" : 5)
+            cost (int): The cost of the instant (in mana)
+            trample (bool): To know if the instant give the trample ability to the target(s) (True -> Yes)
         """
-        self.effect = Effect([],[],[],[],[]) #to do : faire un truc propre ici
+        self.effect = Effect([],[],[],[],[])
         self.type = "instant"
         self.untap = untap
         self.nb_counter = nb_counter
@@ -511,7 +511,7 @@ class Battlefield:
             for crea in self.creature_j_right:
                 if crea.mana_producers > 0 and not crea.summoning_sickness and not crea.is_tap:
                     mana_creature.append[crea]
-            for i in range (-remaining_by_land):
+            for i in range (-remaining_by_land-1):
                 mana_creature[i].is_tap = True
         self.hand_j_right.remove(card)
         card.effect.execute_enter()
@@ -617,23 +617,23 @@ data_base ["Island"] = Land("blue")
 data_base ["Mountain"] = Land("red")
 data_base ["Swamp"] = Land("black")
 data_base ["Plain"] = Land("white")
-data_base ["Gigantosorus"] = Creature(10,10,[],Effect([],[],[],[],[]),{"green" : 5})
-data_base ["Umbling Baloth"] = Creature(4,4,[],Effect([],[],[],[],[]),{"green" : 4})
-data_base ["Sentinel Spider"] = Creature(4,4,["vigilance", "reach"],Effect([],[],[],[],[]),{"green" : 5})
-data_base ["Woodland Mystic"] = Creature(1,1,[],Effect([],[],[],[],[]),{"green" : 2})
+data_base ["Gigantosorus"] = Creature(10,10,[],Effect([],[],[],[],[]),5)
+data_base ["Umbling Baloth"] = Creature(4,4,[],Effect([],[],[],[],[]),4)
+data_base ["Sentinel Spider"] = Creature(4,4,["vigilance", "reach"],Effect([],[],[],[],[]),5)
+data_base ["Woodland Mystic"] = Creature(1,1,[],Effect([],[],[],[],[]),2)
 data_base ["Woodland Mystic"].mana_producers = 1
-data_base ["Ilysian Caryatid"] = Creature(1,1,[],Effect([],[],[],[],[]),{"green" : 2})
+data_base ["Ilysian Caryatid"] = Creature(1,1,[],Effect([],[],[],[],[]),2)
 data_base ["Ilysian Caryatid"].mana_producers = 1
-data_base ["Stony Strength"] = Instant(True, 1, False, {"green" : 1})
-data_base ["Rabid Bite"] = Instant(False, 0, False, {"green" : 2})
-data_base ["Epic Proportions"] = Instant(False, 5, True, {"green" : 6})
-data_base ["Wildwood Patrol"] = Creature(4,2,["trample"], Effect([],[],[],[],[]), {"green" : 3})
-data_base ["Affectionate Indrik"] = Creature(4,4,[], Effect([],[],[True],[],[]), {"green" : 6})
-data_base ["Rampaging Brontodon"] = Creature(7,7, ["trample"], Effect([],[],[],[],[True]), {"green" : 7})
-data_base ["Colossal Majesty"] = Enchantment(Effect([True],[],[],[],[]), {"green" : 3})
-data_base ["Baloth Packhunter"] = Creature(3,3,["trample"],Effect([],[],[False, True],[],[]), {"green" : 4})
+data_base ["Stony Strength"] = Instant(True, 1, False,1)
+data_base ["Rabid Bite"] = Instant(False, 0, False,2)
+data_base ["Epic Proportions"] = Instant(False, 5, True,6)
+data_base ["Wildwood Patrol"] = Creature(4,2,["trample"], Effect([],[],[],[],[]),3)
+data_base ["Affectionate Indrik"] = Creature(4,4,[], Effect([],[],[True],[],[]),6)
+data_base ["Rampaging Brontodon"] = Creature(7,7, ["trample"], Effect([],[],[],[],[True]),7)
+data_base ["Colossal Majesty"] = Enchantment(Effect([True],[],[],[],[]),3)
+data_base ["Baloth Packhunter"] = Creature(3,3,["trample"],Effect([],[],[False, True],[],[]),4)
 data_base ["Baloth Packhunter"].baloth = True
-data_base ["Jungle Delver"] = Creature(1,1,[],Effect([],[True],[],[],[]),{"green" : 1})
+data_base ["Jungle Delver"] = Creature(1,1,[],Effect([],[True],[],[],[]),1)
 
 mono_green = [] #check why their are only 56 cards in this deck
 for i in range (4):

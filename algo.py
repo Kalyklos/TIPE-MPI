@@ -1,5 +1,4 @@
 from battle import *
-from carte import *
 
 list_algo = ["rdm_att"]
 
