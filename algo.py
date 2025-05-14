@@ -123,7 +123,7 @@ class Multi_battlefield:
         
         self.nb_victory_algo_1_start = self.nb_victory_algo_2_start = self.nb_victory_algo_1_2nd = self.nb_victory_algo_2_2nd = 0
         for i in range (self.nb_sim):
-            if self.one_dual ():
+            if self.one_dual () == 0:
                 self.nb_victory_algo_1_start += 1
             else:
                 self.nb_victory_algo_2_2nd += 1
@@ -137,5 +137,5 @@ class Multi_battlefield:
         return f"L'algo 1 a gagné {self.nb_victory_algo_1_start} fois en commençant et {self.nb_victory_algo_1_2nd} fois en jouant en 2ème avec le deck mono-green. L'algo 2 a gagné {self.nb_victory_algo_2_start} fois en commençant et {self.nb_victory_algo_2_2nd} fois en jouant en 2ème avec le deck mono-green."
 
 # PHASE DE TEST :
-multi = Multi_battlefield ((mono_green, mono_green),(0,0),1)
+multi = Multi_battlefield ((mono_green, mono_green),(0,0),50)
 print(multi.multi_dual())
