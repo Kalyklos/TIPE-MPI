@@ -241,7 +241,8 @@ class Battlefield:
             deck_j_right (dict): a magic deck
         """
         self.winner = -1
-        self.life_j_left = self.life_j_right = 20
+        self.life_j_left = 20
+        self.life_j_right = 20
         self.can_cast_sorcery_left = self.can_cast_sorcery_right = False
         self.mana_used_left = 0
         self.mana_used_rights = 0
@@ -464,6 +465,7 @@ class Battlefield:
         if left:
             self.creature_j_left.append(crea)
             return
+        crea.owner = False
         self.creature_j_right.append(crea)
         return
     def play_a_card (self, card, left):
@@ -577,7 +579,7 @@ class Combat_phase:
                 if crea.owner:
                     self.actual_battlefield.life_j_right -= crea.actual_strength
                 else:
-                    self.actual_battlefield.life_j_right -= crea.actual_strength
+                    self.actual_battlefield.life_j_left -= crea.actual_strength
             else:
                 crea.actual_life -= self.attacking_creature[crea].actual_strength
                 self.attacking_creature[crea].actual_life -= crea.actual_strength

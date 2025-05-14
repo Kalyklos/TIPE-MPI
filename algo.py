@@ -108,6 +108,7 @@ class Multi_battlefield:
             self.algo_2 = Random_algo_att (False, current_battlefield)
         current_battlefield.game_begin()
         left = True       #l'algo_1 sera considéré comme joueur de gauche et commencera
+        i = 0
         while current_battlefield.winner == -1:
             current_battlefield.upkeep(left)
             if left:
@@ -136,5 +137,5 @@ class Multi_battlefield:
         return f"L'algo 1 a gagné {self.nb_victory_algo_1_start} fois en commençant et {self.nb_victory_algo_1_2nd} fois en jouant en 2ème avec le deck mono-green. L'algo 2 a gagné {self.nb_victory_algo_2_start} fois en commençant et {self.nb_victory_algo_2_2nd} fois en jouant en 2ème avec le deck mono-green."
 
 # PHASE DE TEST :
-multi = Multi_battlefield ((mono_green, mono_green),(0,0),2)
+multi = Multi_battlefield ((mono_green, mono_green),(0,0),1)
 print(multi.multi_dual())
