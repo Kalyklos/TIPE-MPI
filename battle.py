@@ -284,8 +284,9 @@ class Battlefield:
             mana_creature = []
             for crea in self.creature_j_left:
                     if crea.mana_producers > 0 and (not crea.summoning_sickness) and (not crea.is_tap):
-                        mana_creature.append[crea]
+                        mana_creature.append(crea)
             if len(mana_creature) + self.nb_land_in_play_left - self.mana_used_left - card.cost >= 0:
+                    print("Left : ", len(mana_creature) + self.nb_land_in_play_left - self.mana_used_left - card.cost)
                     print("Left has mana_producers", mana_creature, len(mana_creature))          
                     print("Left has ", self.nb_land_in_play_left, "land in play and ", self.mana_used_left, " mana used")
                     print("So Left has ", len(mana_creature) + self.nb_land_in_play_left - self.mana_used_left, "mana and need ", card.cost, "mana : the card is playable")
@@ -294,8 +295,9 @@ class Battlefield:
         mana_creature = []
         for crea in self.creature_j_right:
                 if crea.mana_producers > 0 and (not crea.summoning_sickness) and (not crea.is_tap):
-                    mana_creature.append[crea]
-        if len(mana_creature) + self.nb_land_in_play_left - self.mana_used_left - card.cost >= 0:
+                    mana_creature.append(crea)
+        if len(mana_creature) + self.nb_land_in_play_right - self.mana_used_right - card.cost >= 0:
+            print("Right : ", len(mana_creature) + self.nb_land_in_play_right - self.mana_used_right - card.cost)
             print("Right has mana_producers", mana_creature, len(mana_creature))
             print("Right has ", self.nb_land_in_play_right, "land in play and ", self.mana_used_right, " mana used")
             print("So Right has ", len(mana_creature) + self.nb_land_in_play_right - self.mana_used_right, "mana and need ", card.cost, "mana : the card is playable")
@@ -490,10 +492,14 @@ class Battlefield:
                 mana_creature = []
                 for crea in self.creature_j_left:
                     if crea.mana_producers > 0 and not crea.summoning_sickness and not crea.is_tap:
-                        mana_creature.append[crea]
+                        mana_creature.append(crea)
                 for i in range (-remaining):
                     mana_creature[i].is_tap = True
             self.hand_j_left.remove(card)
+            if card.type == "creature":
+                self.new_creature(left, card)
+            elif card.type == "enchantment":
+                self.enchant_j_left.append(card)
             card.effect.execute_enter()
             return                
         remaining = self.nb_land_in_play_right - self.mana_used_right - card.cost
@@ -501,10 +507,14 @@ class Battlefield:
             mana_creature = []
             for crea in self.creature_j_right:
                 if crea.mana_producers > 0 and not crea.summoning_sickness and not crea.is_tap:
-                    mana_creature.append[crea]
+                    mana_creature.append(crea)
             for i in range (-remaining):
                 mana_creature[i].is_tap = True
         self.hand_j_right.remove(card)
+        if card.type == "creature":
+                self.new_creature(left, card)
+        elif card.type == "enchantment":
+            self.enchant_j_left.append(card)
         card.effect.execute_enter()
         return 
     
