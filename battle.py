@@ -600,7 +600,49 @@ class Combat_phase:
     def finish (self):
         self.actual_battlefield.is_finish()
 
-""" Définition de toutes les cartes utilisé.
+def copy_battlefield (battlefield):
+    """A function to copy a battlefield
+
+    Args:
+        battlefield (Battlefield): the battlefield to copy
+    """
+    new_battlefield = Battlefield(battlefield.deck_j_left.copy(), battlefield.deck_j_right.copy())
+    new_battlefield.creature_j_left = battlefield.creature_j_left.copy()
+    new_battlefield.creature_j_right = battlefield.creature_j_right.copy()
+    new_battlefield.enchant_j_left = battlefield.enchant_j_left.copy()
+    new_battlefield.enchant_j_right = battlefield.enchant_j_right.copy()
+    new_battlefield.hand_j_left = battlefield.hand_j_left.copy()
+    new_battlefield.hand_j_right = battlefield.hand_j_right.copy()
+    new_battlefield.gravyard_j_left = battlefield.gravyard_j_left.copy()
+    new_battlefield.gravyard_j_right = battlefield.gravyard_j_right.copy()
+    new_battlefield.nb_land_in_play_left = battlefield.nb_land_in_play_left
+    new_battlefield.nb_land_in_play_right = battlefield.nb_land_in_play_right
+    new_battlefield.life_j_left = battlefield.life_j_left
+    new_battlefield.life_j_right = battlefield.life_j_right
+    new_battlefield.mana_used_left = battlefield.mana_used_left
+    new_battlefield.mana_used_right = battlefield.mana_used_right
+    new_battlefield.can_cast_sorcery_left = battlefield.can_cast_sorcery_left
+    new_battlefield.can_cast_sorcery_right = battlefield.can_cast_sorcery_right
+    new_battlefield.hand_size_left = battlefield.hand_size_left
+    new_battlefield.hand_size_right = battlefield.hand_size_right
+    new_battlefield.upkeep_left = battlefield.upkeep_left.copy()
+    new_battlefield.upkeep_right = battlefield.upkeep_right.copy()
+    new_battlefield.combat_left = battlefield.combat_left.copy()
+    new_battlefield.combat_right = battlefield.combat_right.copy()
+    new_battlefield.trigger_effect_attack_left = battlefield.trigger_effect_attack_left.copy()
+    new_battlefield.trigger_effect_attack_right = battlefield.trigger_effect_attack_right.copy()
+    new_battlefield.trigger_effect_damage_left = battlefield.trigger_effect_damage_left.copy()
+    new_battlefield.trigger_effect_damage_right = battlefield.trigger_effect_damage_right.copy()
+    new_battlefield.trigger_effect_upkeep_left = battlefield.trigger_effect_upkeep_left.copy()
+    new_battlefield.trigger_effect_upkeep_right = battlefield.trigger_effect_upkeep_right.copy()
+    new_battlefield.trigger_effect_end_step_left = battlefield.trigger_effect_end_step_left.copy()
+    new_battlefield.trigger_effect_end_step_right = battlefield.trigger_effect_end_step_right.copy()
+    return new_battlefield
+
+
+
+
+""" Définition de toutes les cartes utilisés.
 """
 data_base = {}
 data_base ["Forest"] = Land("green")

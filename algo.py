@@ -77,7 +77,77 @@ class Random_algo_att:
             c.actual_life += life
             c.life += life
         return
+class Opti_algo_att:
+    def __init__ (self, left, battlefield_play):
+        """
+        Init of the Random_algo_att class
 
+        Args:
+            left (bool): The player who use this algorithm (True -> left)
+            battlefield_play (Battlefield): The battlefield of the game
+        """
+        self.left = left
+        self.battlefield_play = battlefield_play
+    def can_play (self, have_play_land):
+
+        if not have_play_land:
+            self.battlefield_play.play_land(self.left)
+        fake_battlefield = copy_battlefield(self.battlefield_play)
+        cards = []
+        playable = False
+        if self.left:
+            for c in self.battlefield_play.hand_j_left:
+                if self.battlefield_play.is_playable(self.left, c):
+                    playable = True
+                    fake_battlefield.play_a_card(c, self.left)
+                    cards.append(fake_battlefield.nb_land_in_play_left - fake_battlefield.mana_used_left)
+                    fake_battlefield = copy_battlefield(self.battlefield_play)
+                else:
+                    cards.append(1000)
+        else:
+            for c in self.battlefield_play.hand_j_right:
+                if self.battlefield_play.is_playable(self.left, c):
+                    playable_card.append(c)
+        if len(playable_card) > 0:
+            shuffle(playable_card)
+            self.battlefield_play.play_a_card(playable_card.pop(), self.left)
+            self.can_play(True)
+        return
+    def combat (self):
+        """
+    Execute the combat phase.
+    """
+        com = Combat_phase (self.battlefield_play)
+        com.reset()
+        com.attack_phase(self.battlefield_play.possible_attacking_creature(self.left))
+        com.assign_damage()
+        com.finish()
+        com.died_effect()
+        com.finish()
+        return
+    def boost_target_crea (self, strength, life):
+        """
+        Boost a random creature in the board of the player who is playing,
+        by adding the given strength and life.
+        """
+        if self.left:
+            if len(self.battlefield_play.board_j_left) > 0:
+                random.shuffle(self.battlefield_play.board_j_left)
+                c = self.battlefield_play.board_j_left[0]
+                c.strength += strength
+                c.actual_strength += strength
+                c.actual_life += life
+                c.life += life
+            return
+        if len(self.battlefield_play.board_j_right) > 0:
+            random.shuffle(self.battlefield_play.board_j_right)
+            c = self.battlefield_play.board_j_right[0]
+            c.strength += strength
+            c.actual_strength += strength
+            c.actual_life += life
+            c.life += life
+        return
+    
 class Multi_battlefield:
     def __init__ (self, deck_couple, algo_indice_couple, nb_sim):
         """
