@@ -104,14 +104,25 @@ class Opti_algo_att:
                     fake_battlefield = copy_battlefield(self.battlefield_play)
                 else:
                     cards.append(1000)
+            if playable:
+                min_card = min(cards)
+                index = cards.index(min_card)
+                self.battlefield_play.play_a_card(self.battlefield_play.hand_j_left[index], self.left)
         else:
             for c in self.battlefield_play.hand_j_right:
                 if self.battlefield_play.is_playable(self.left, c):
-                    playable_card.append(c)
-        if len(playable_card) > 0:
-            shuffle(playable_card)
-            self.battlefield_play.play_a_card(playable_card.pop(), self.left)
-            self.can_play(True)
+                    playable = True
+                    fake_battlefield.play_a_card(c, self.left)
+                    cards.append(fake_battlefield.nb_land_in_play_right - fake_battlefield.mana_used_right)
+                    fake_battlefield = copy_battlefield(self.battlefield_play)
+                else:
+                    cards.append(1000)
+            if playable:
+                min_card = min(cards)
+                index = cards.index(min_card)
+                self.battlefield_play.play_a_card(self.battlefield_play.hand_j_right[index], self.left)
+        if playable:
+            return self.can_play(True)
         return
     def combat (self):
         """
@@ -174,8 +185,12 @@ class Multi_battlefield:
         current_battlefield = Battlefield (self.deck_1.copy(), self.deck_2.copy())
         if self.algo_indice_1 == 0:
             self.algo_1 = Random_algo_att (True, current_battlefield)
+        elif self.algo_indice_1 == 1:
+            self.algo_1 = Opti_algo_att (True, current_battlefield)
         if self.algo_indice_2 == 0:
             self.algo_2 = Random_algo_att (False, current_battlefield)
+        elif self.algo_indice_2 == 1:
+            self.algo_2 = Opti_algo_att (False, current_battlefield)
         current_battlefield.game_begin()
         left = True       #l'algo_1 sera considéré comme joueur de gauche et commencera
         i = 0
@@ -207,5 +222,5 @@ class Multi_battlefield:
         return f"L'algo 1 a gagné {self.nb_victory_algo_1_start} fois en commençant et {self.nb_victory_algo_1_2nd} fois en jouant en 2ème avec le deck mono-green. L'algo 2 a gagné {self.nb_victory_algo_2_start} fois en commençant et {self.nb_victory_algo_2_2nd} fois en jouant en 2ème avec le deck mono-green."
 
 # PHASE DE TEST :
-multi = Multi_battlefield ((mono_green, mono_green),(0,0),50)
+multi = Multi_battlefield ((mono_green, mono_green),(0,1),50)
 print(multi.multi_dual())
