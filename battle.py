@@ -245,7 +245,7 @@ class Battlefield:
         self.life_j_right = 20
         self.can_cast_sorcery_left = self.can_cast_sorcery_right = False
         self.mana_used_left = 0
-        self.mana_used_rights = 0
+        self.mana_used_right = 0
         self.creature_j_left = []
         self.creature_j_right = []
         self.enchant_j_right = []
@@ -607,10 +607,10 @@ def copy_battlefield (battlefield):
         battlefield (Battlefield): the battlefield to copy
     """
     new_battlefield = Battlefield(battlefield.deck_j_left.copy(), battlefield.deck_j_right.copy())
-    new_battlefield.creature_j_left = battlefield.creature_j_left.copy()
-    new_battlefield.creature_j_right = battlefield.creature_j_right.copy()
-    new_battlefield.enchant_j_left = battlefield.enchant_j_left.copy()
-    new_battlefield.enchant_j_right = battlefield.enchant_j_right.copy()
+    new_battlefield.creature_j_left = []
+    new_battlefield.creature_j_right = []
+    new_battlefield.enchant_j_left = []
+    new_battlefield.enchant_j_right = []
     new_battlefield.hand_j_left = battlefield.hand_j_left.copy()
     new_battlefield.hand_j_right = battlefield.hand_j_right.copy()
     new_battlefield.gravyard_j_left = battlefield.gravyard_j_left.copy()
@@ -637,6 +637,34 @@ def copy_battlefield (battlefield):
     new_battlefield.trigger_effect_upkeep_right = battlefield.trigger_effect_upkeep_right.copy()
     new_battlefield.trigger_effect_end_step_left = battlefield.trigger_effect_end_step_left.copy()
     new_battlefield.trigger_effect_end_step_right = battlefield.trigger_effect_end_step_right.copy()
+    for crea in battlefield.creature_j_left:
+        new_crea = Creature(crea.strength, crea.life, crea.keywords.copy(), crea.effect, crea.cost)
+        new_crea.actual_life = crea.actual_life
+        new_crea.actual_strength = crea.actual_strength
+        new_crea.is_tap = crea.is_tap
+        new_crea.can_untap = crea.can_untap
+        new_crea.owner = True
+        new_crea.summoning_sickness = crea.summoning_sickness
+        new_crea.mana_producers = crea.mana_producers
+        new_battlefield.creature_j_left.append(new_crea)
+    for crea in battlefield.creature_j_right:
+        new_crea = Creature(crea.strength, crea.life, crea.keywords.copy(), crea.effect, crea.cost)
+        new_crea.actual_life = crea.actual_life
+        new_crea.actual_strength = crea.actual_strength
+        new_crea.is_tap = crea.is_tap
+        new_crea.can_untap = crea.can_untap
+        new_crea.owner = False
+        new_crea.summoning_sickness = crea.summoning_sickness
+        new_crea.mana_producers = crea.mana_producers
+        new_battlefield.creature_j_right.append(new_crea)
+    for enchant in battlefield.enchant_j_left:
+        new_enchant = Enchantment(enchant.effect, enchant.cost)
+        new_enchant.actual_battlefield = new_battlefield
+        new_battlefield.enchant_j_left.append(new_enchant)
+    for enchant in battlefield.enchant_j_right:
+        new_enchant = Enchantment(enchant.effect, enchant.cost)
+        new_enchant.actual_battlefield = new_battlefield
+        new_battlefield.enchant_j_right.append(new_enchant)
     return new_battlefield
 
 

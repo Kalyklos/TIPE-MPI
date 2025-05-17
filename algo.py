@@ -100,7 +100,7 @@ class Opti_algo_att:
                 if self.battlefield_play.is_playable(self.left, c):
                     playable = True
                     fake_battlefield.play_a_card(c, self.left)
-                    cards.append(fake_battlefield.nb_land_in_play_left - fake_battlefield.mana_used_left)
+                    cards.append(fake_battlefield.nb_land_in_play_left - fake_battlefield.mana_used_left - c.cost)
                     fake_battlefield = copy_battlefield(self.battlefield_play)
                 else:
                     cards.append(1000)
@@ -109,11 +109,18 @@ class Opti_algo_att:
                 index = cards.index(min_card)
                 self.battlefield_play.play_a_card(self.battlefield_play.hand_j_left[index], self.left)
         else:
+            mana_creature = []
+            for crea in self.battlefield_play.creature_j_right:
+                        if crea.mana_producers > 0 and not crea.summoning_sickness and not crea.is_tap:
+                            mana_creature.append(crea)
             for c in self.battlefield_play.hand_j_right:
                 if self.battlefield_play.is_playable(self.left, c):
+                    print(fake_battlefield.is_playable(self.left, c))
                     playable = True
+                    print("playable and mana tot :", fake_battlefield.nb_land_in_play_right,"mana creature : ", mana_creature, "mana used : ", fake_battlefield.mana_used_right, "mana cost : ", c.cost)
+                    print("mana left :", len(mana_creature) + fake_battlefield.nb_land_in_play_right - fake_battlefield.mana_used_right - c.cost)
                     fake_battlefield.play_a_card(c, self.left)
-                    cards.append(fake_battlefield.nb_land_in_play_right - fake_battlefield.mana_used_right)
+                    cards.append(len(mana_creature) + fake_battlefield.nb_land_in_play_right - fake_battlefield.mana_used_right - c.cost)
                     fake_battlefield = copy_battlefield(self.battlefield_play)
                 else:
                     cards.append(1000)
@@ -200,6 +207,7 @@ class Multi_battlefield:
                 self.algo_1.can_play(False)
                 self.algo_1.combat()
             else:
+                print("new turn")
                 self.algo_2.can_play(False)
                 self.algo_2.combat()
             left = not left
