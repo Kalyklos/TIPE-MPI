@@ -1,5 +1,4 @@
 from battle import *
-import time
 list_algo = ["rdm_att"]
 
 class Random_algo_att:
@@ -212,13 +211,11 @@ class Multi_battlefield:
         
         self.nb_victory_algo_1_start = self.nb_victory_algo_2_start = self.nb_victory_algo_1_2nd = self.nb_victory_algo_2_2nd = 0
         for i in range (self.nb_sim):
-            time.sleep(0.01)
             if self.one_dual (True) == 0:
                 self.nb_victory_algo_1_start += 1
             else:
                 self.nb_victory_algo_2_2nd += 1
         for i in range (self.nb_sim):
-            time.sleep(0.01)
             if self.one_dual (False) == 0:
                 self.nb_victory_algo_2_start += 1
             else:

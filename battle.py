@@ -513,7 +513,7 @@ class Battlefield:
         """
         shuffle(self.deck_j_left)
         shuffle(self.deck_j_right)
-        self.draw (True, 7)
+        self.draw (True, 6)
         self.draw (False, 7)
         self.winner = -1
         return
