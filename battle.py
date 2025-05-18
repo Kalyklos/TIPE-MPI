@@ -1,4 +1,4 @@
-"""In this module, all int are positive. The goal of this module is to implement function to create and administrate a battlefield.  """
+"""The goal of this module is to implement function to create and administrate a battlefield.  """
 
 from random import *
 seed()
@@ -440,8 +440,10 @@ class Battlefield:
         """
         if self.life_j_left < 1:
             self.winner = 0
+            print("right player win")
             return 0
         if self.life_j_right < 1:
+            print("left player win")
             self.winner = 1
             return 1
         return -1
