@@ -1,5 +1,5 @@
 from battle import *
-
+import time
 list_algo = ["rdm_att"]
 
 class Random_algo_att:
@@ -115,10 +115,7 @@ class Opti_algo_att:
                             mana_creature.append(crea)
             for c in self.battlefield_play.hand_j_right:
                 if self.battlefield_play.is_playable(self.left, c):
-                    print(fake_battlefield.is_playable(self.left, c))
                     playable = True
-                    print("playable and mana tot :", fake_battlefield.nb_land_in_play_right,"mana creature : ", mana_creature, "mana used : ", fake_battlefield.mana_used_right, "mana cost : ", c.cost)
-                    print("mana left :", len(mana_creature) + fake_battlefield.nb_land_in_play_right - fake_battlefield.mana_used_right - c.cost)
                     fake_battlefield.play_a_card(c, self.left)
                     cards.append(len(mana_creature) + fake_battlefield.nb_land_in_play_right - fake_battlefield.mana_used_right - c.cost)
                     fake_battlefield = copy_battlefield(self.battlefield_play)
@@ -179,7 +176,7 @@ class Multi_battlefield:
         self.deck_1, self.deck_2 = deck_couple
         self.nb_sim = nb_sim
         self.algo_indice_1, self.algo_indice_2 = algo_indice_couple
-    def one_dual (self):
+    def one_dual (self, left):
         """ Simulates a single duel between two decks using specified algorithms.
     This function initializes a battlefield with the given decks and assigns
     algorithms to the left and right players based on their indices. The duel
@@ -189,6 +186,7 @@ class Multi_battlefield:
     The left player always starts first, and the game continues until one of
     the player wins.
     """
+        self.left = left
         current_battlefield = Battlefield (self.deck_1.copy(), self.deck_2.copy())
         if self.algo_indice_1 == 0:
             self.algo_1 = Random_algo_att (True, current_battlefield)
@@ -199,36 +197,34 @@ class Multi_battlefield:
         elif self.algo_indice_2 == 1:
             self.algo_2 = Opti_algo_att (False, current_battlefield)
         current_battlefield.game_begin()
-        left = True       #l'algo_1 sera considéré comme joueur de gauche et commencera
         i = 0
         while current_battlefield.winner == -1:
-            current_battlefield.upkeep(left)
-            if left:
+            current_battlefield.upkeep(self.left)
+            if self.left:
                 self.algo_1.can_play(False)
                 self.algo_1.combat()
             else:
-                print("new turn")
                 self.algo_2.can_play(False)
                 self.algo_2.combat()
-            left = not left
+            self.left = not self.left
         return current_battlefield.winner
     def multi_dual (self):
         
         self.nb_victory_algo_1_start = self.nb_victory_algo_2_start = self.nb_victory_algo_1_2nd = self.nb_victory_algo_2_2nd = 0
         for i in range (self.nb_sim):
-            if self.one_dual () == 0:
+            time.sleep(0.01)
+            if self.one_dual (True) == 0:
                 self.nb_victory_algo_1_start += 1
             else:
                 self.nb_victory_algo_2_2nd += 1
-        self.algo_indice_1, self.algo_indice_2 = self.algo_indice_2, self.algo_indice_1
-        self.deck_1, self.deck_2 = self.deck_2, self.deck_1
         for i in range (self.nb_sim):
-            if self.one_dual ():
+            time.sleep(0.01)
+            if self.one_dual (False) == 0:
                 self.nb_victory_algo_2_start += 1
             else:
                 self.nb_victory_algo_1_2nd += 1
         return f"L'algo 1 a gagné {self.nb_victory_algo_1_start} fois en commençant et {self.nb_victory_algo_1_2nd} fois en jouant en 2ème avec le deck mono-green. L'algo 2 a gagné {self.nb_victory_algo_2_start} fois en commençant et {self.nb_victory_algo_2_2nd} fois en jouant en 2ème avec le deck mono-green."
 
 # PHASE DE TEST :
-multi = Multi_battlefield ((mono_green, mono_green),(1,0),50)
+multi = Multi_battlefield ((mono_green, mono_green),(0,1),10000)
 print(multi.multi_dual())
